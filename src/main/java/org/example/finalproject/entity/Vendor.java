@@ -6,23 +6,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "shopping_carts")
+@Table(name = "vendors")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ShoppingCart {
+public class Vendor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "customer_id", unique = true, nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    private LocalDateTime createdAt;
+    @Column(unique = true, nullable = false, length = 50)
+    private String vendorCode;
+
+    @Column(nullable = false, length = 50)
+    private String cardNumber;
+
+    private Boolean isActive;
 }

@@ -40,15 +40,13 @@ public class CategoryService {
 
         CategoryDto dto = categoryMapper.toDto(category);
 
-        if (category.getParent() == null) {
-            List<Category> subCategories = categoryRepository.findByParentId(category.getId());
+        List<Category> subCategories = categoryRepository.findByParentId(category.getId());
 
-            List<CategoryDto> subCategoriesToDto = subCategories.stream()
-                    .map(categoryMapper::toDto)
-                    .toList();
+        List<CategoryDto> subCategoriesToDto = subCategories.stream()
+                .map(categoryMapper::toDto)
+                .toList();
 
-            dto.setSubCategory(subCategoriesToDto);
-        }
+        dto.setSubCategory(subCategoriesToDto);
 
         return dto;
     }

@@ -1,3 +1,6 @@
 databaseChangeLog:
+  - include:
+     file:liquibase/1.0/create_table.sql
+
   - includeAll:
       path: liquibase/1.0

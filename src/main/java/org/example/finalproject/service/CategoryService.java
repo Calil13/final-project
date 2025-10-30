@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.entity.Category;
+import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.CategoryMapper;
 import org.example.finalproject.repository.CategoryRepository;
@@ -22,6 +23,7 @@ public class CategoryService {
     public List<CategoryDto> getParentCategories() {
         List<Category> category = categoryRepository.findByParentIdIsNull();
 
+        //log
         return category.stream()
                 .map(c -> CategoryDto.builder()
                         .id(c.getId())
@@ -66,7 +68,13 @@ public class CategoryService {
         categoryRepository.save(parentCategory);
     }
 
+    @SuppressWarnings("LoggingSimilarMessage")
     public void editCategory(CategoryDto categoryDto, Long id) {
+        var editCategory = categoryRepository.findById(id).orElseThrow(() -> {
+            log.error("Category with id {} not found", id);
+            return new NotFoundException("Category not found!");
+        });
+
 
     }
 }

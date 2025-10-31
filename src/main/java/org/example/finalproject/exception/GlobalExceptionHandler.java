@@ -24,4 +24,28 @@ public class GlobalExceptionHandler {
 
         return new ExceptionDto(body);
     }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto alreadyExistsException(AlreadyExistsException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Already exists");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(UnexpectedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto unexpectedException(UnexpectedException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Unexpected error occurred");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
 }

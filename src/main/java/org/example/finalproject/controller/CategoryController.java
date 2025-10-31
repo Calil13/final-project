@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.service.CategoryService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("final-project/category")
+@RequestMapping("final-project-test/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -25,15 +26,25 @@ public class CategoryController {
         return categoryService.getCategoryById(categoryId);
     }
 
-    @PostMapping("/createCategory")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createCategory(@RequestBody CategoryDto categoryDto) {
         categoryService.createCategory(categoryDto);
     }
 
-    @PostMapping("/{parentId}/addSubCategory")
+    @PostMapping("/{parentId}/sub")
     @ResponseStatus(HttpStatus.CREATED)
     public void addSubcategory(@PathVariable Long parentId, @RequestBody CategoryDto subCategory) {
         categoryService.addSubcategory(parentId, subCategory);
+    }
+
+    @PatchMapping("/{id}")
+    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long Id) {
+        categoryService.editCategory(categoryDto, Id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
     }
 }

@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.entity.Category;
-import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
+import org.example.finalproject.exception.UnexpectedException;
 import org.example.finalproject.mapper.CategoryMapper;
 import org.example.finalproject.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -75,6 +75,24 @@ public class CategoryService {
             return new NotFoundException("Category not found!");
         });
 
+        if (categoryDto.getName() != null) {
+            editCategory.setName(categoryDto.getName());
+        } else {
+            log.error("JSON format is wrong");
+            throw new UnexpectedException("JSON only accepts a name parameter");
+        }
 
+        categoryRepository.save(editCategory);
+    }
+
+    @SuppressWarnings("LoggingSimilarMessage")
+    public void deleteCategory(Long id) {
+        var category =  categoryRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Category with id {} not found", id);
+                    return new NotFoundException("Category not found");
+                });
+
+        categoryRepository.delete(category);
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("final-project/category")
+@RequestMapping("final-project-test/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -38,8 +38,13 @@ public class CategoryController {
         categoryService.addSubcategory(parentId, subCategory);
     }
 
-    @PatchMapping("/{categoryId}")
-    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) {
-        categoryService.editCategory(categoryDto, categoryId);
+    @PatchMapping("/{id}")
+    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long Id) {
+        categoryService.editCategory(categoryDto, Id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
     }
 }

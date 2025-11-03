@@ -20,8 +20,13 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    private Products products;
+    private Products product;
 
     @Column(nullable = false)
     private String imageUrl;
+
+    public ProductImage(String imageUrl, Products products) {
+        this.imageUrl = imageUrl;
+        this.product = products;
+    }
 }

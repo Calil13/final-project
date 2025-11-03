@@ -39,8 +39,8 @@ public class CategoryController {
     }
 
     @PatchMapping("/{id}")
-    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long Id) {
-        categoryService.editCategory(categoryDto, Id);
+    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
+        categoryService.editCategory(categoryDto, id);
     }
 
     @DeleteMapping("/{id}")

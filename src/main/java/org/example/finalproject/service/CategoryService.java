@@ -23,7 +23,6 @@ public class CategoryService {
     public List<CategoryDto> getParentCategories() {
         List<Category> category = categoryRepository.findByParentIdIsNull();
 
-        //log
         return category.stream()
                 .map(c -> CategoryDto.builder()
                         .id(c.getId())
@@ -71,7 +70,7 @@ public class CategoryService {
     @SuppressWarnings("LoggingSimilarMessage")
     public void editCategory(CategoryDto categoryDto, Long id) {
         var editCategory = categoryRepository.findById(id).orElseThrow(() -> {
-            log.error("Category with id {} not found", id);
+            log.error("Category with Id {} not found", id);
             return new NotFoundException("Category not found!");
         });
 

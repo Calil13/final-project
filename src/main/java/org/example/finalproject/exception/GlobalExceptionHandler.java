@@ -48,4 +48,16 @@ public class GlobalExceptionHandler {
 
         return new ExceptionDto(body);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleIllegalArgument(IllegalArgumentException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Invalid Request Parameter");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
 }

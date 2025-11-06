@@ -20,7 +20,7 @@ public class Vendor {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users user;
 
     @Column(unique = true, nullable = false, length = 50)
     private String vendorCode;

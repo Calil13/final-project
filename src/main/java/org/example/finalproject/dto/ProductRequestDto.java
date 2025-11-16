@@ -15,5 +15,6 @@ public class ProductRequestDto {
     private Double price;
     private Integer stock;
     private Long categoryId;
-    private Long vendorId;
+    //private Long vendorId; - vendor id yə ehtiyac yoxdur çünki,
+    //securiy ilə vendor service class da təyin olunur
 }

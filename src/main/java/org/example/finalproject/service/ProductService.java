@@ -42,7 +42,7 @@ public class ProductService {
 
     public Page<ProductResponseDto> getVendorProducts(Long vendorId, Pageable pageable) {
 
-        var vendor = vendorRepository.findById(vendorId)
+        vendorRepository.findById(vendorId)
                 .orElseThrow(() -> {
                     log.error("Vendor not found with id: {}", vendorId);
                     return new NotFoundException("Vendor not found!");

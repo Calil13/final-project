@@ -1,5 +1,4 @@
 ALTER TABLE customers
-    ADD COLUMN phone VARCHAR(30),
     ADD COLUMN address VARCHAR(255);
 
 ALTER TABLE customers

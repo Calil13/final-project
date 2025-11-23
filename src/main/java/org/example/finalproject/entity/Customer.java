@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "customers")
 @Data
@@ -22,7 +24,9 @@ public class Customer {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    private String fullName;
     private String phone;
-    private String cardNumber;
+    private String address;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }

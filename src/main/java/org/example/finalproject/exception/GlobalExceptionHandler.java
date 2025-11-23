@@ -60,4 +60,26 @@ public class GlobalExceptionHandler {
 
         return new ExceptionDto(body);
     }
+
+    @ExceptionHandler(OtpNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleOtpException(OtpNotValidException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Invalid OTP Code");
+        body.put("message", e.getMessage());
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    @ResponseStatus(HttpStatus.GONE)
+    public ExceptionDto handleExpiredOtpException(OtpNotValidException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.GONE.value());
+        body.put("error", "OTP has expired");
+        body.put("message", e.getMessage());
+        return new ExceptionDto(body);
+    }
 }

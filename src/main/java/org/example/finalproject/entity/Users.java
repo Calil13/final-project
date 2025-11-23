@@ -21,21 +21,24 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String surname;
-
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String surname;
+
     @Column(name = "user_role", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @Column(name = "card_number")
+    private String cardNumber;
 
     private LocalDateTime createdAt;
 }

@@ -22,11 +22,8 @@ public class Vendor {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @Column(unique = true, nullable = false, length = 50)
-    private String vendorCode;
-
-    @Column(nullable = false, length = 50)
-    private String cardNumber;
+    @Column(name = "store_name")
+    private String storeName;
 
     private Boolean isActive;
 }

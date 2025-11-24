@@ -8,7 +8,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
 
-    @Mapping(target = "userRole", expression = "java(UserRole.CUSTOMER)")
+    @Mapping(target = "userRole", expression = "java(org.example.finalproject.enums.UserRole.CUSTOMER)")
     @Mapping(target = "password", ignore = true) // password sonradan set ediləcək
     Users toEntity(CustomerFinishRegisterDto dto);
 }

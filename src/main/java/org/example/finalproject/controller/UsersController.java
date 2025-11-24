@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("final-project/users")
+@RequestMapping("/final-project/users")
 public class UsersController {
 }

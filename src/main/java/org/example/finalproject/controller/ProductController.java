@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("final-project/product")
+@RequestMapping("/final-project/product")
 @Tag(name = "Products", description = "Product management endpoints")
 public class ProductController {
 

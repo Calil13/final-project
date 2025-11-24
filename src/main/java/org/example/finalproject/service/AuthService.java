@@ -36,7 +36,7 @@ public class AuthService {
     }
 
     public String verifyOtp(CustomerVerifyOtpDto verify) {
-        otpService.verifyOtp(verify.getOtp());
+        otpService.verifyOtp(verify.getEmail(), verify.getOtp());
         return "OTP verified!";
     }
 

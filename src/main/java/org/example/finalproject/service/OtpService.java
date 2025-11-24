@@ -1,5 +1,6 @@
 package org.example.finalproject.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.entity.OtpCode;
 import org.example.finalproject.exception.NotFoundException;
@@ -11,9 +12,11 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OtpService {
 
     private final OtpRepository otpRepository;
+    private final EmailService emailService;
 
     public String sendOtp(String email) {
 
@@ -29,14 +32,15 @@ public class OtpService {
 
         otpRepository.save(otp);
 
-        System.out.println("OTP sent to email: " + email + " Code: " + code);
+        emailService.sendOtpEmail(email, code);
+        //System.out.println("OTP sent to email: " + email + " Code: " + code);
 
         return "OTP sent successfully!";
     }
 
-    public void verifyOtp(String Otp) {
+    public void verifyOtp(String email, String Otp) {
 
-        OtpCode otp = otpRepository.findByEmail(Otp)
+        OtpCode otp = otpRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("OTP not found!"));
 
         if (otp.getExpiresAt().isBefore(LocalDateTime.now())) {

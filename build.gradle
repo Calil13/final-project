@@ -48,6 +48,9 @@ dependencies {
     testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
     testImplementation 'org.apache.groovy:groovy-all:4.0.21'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //Email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

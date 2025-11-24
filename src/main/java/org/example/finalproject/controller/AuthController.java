@@ -9,7 +9,7 @@ import org.example.finalproject.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("final-project/auth")
+@RequestMapping("/final-project/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

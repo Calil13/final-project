@@ -36,5 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 
-# Spring secret config
 src/main/resources/application.properties

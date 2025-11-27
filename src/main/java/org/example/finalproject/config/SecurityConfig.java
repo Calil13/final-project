@@ -26,10 +26,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/final-project/auth/**",
+                        .requestMatchers(
+                                "/final-project/auth/register/**",
+                                "/final-project/auth/login",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
+
+                        .requestMatchers("/final-project/vendors/become").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -33,7 +33,6 @@ public class OtpService {
         otpRepository.save(otp);
 
         emailService.sendOtpEmail(email, code);
-        //System.out.println("OTP sent to email: " + email + " Code: " + code);
 
         return "OTP sent successfully!";
     }

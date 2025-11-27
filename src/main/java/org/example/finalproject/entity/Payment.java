@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.finalproject.enums.PaymentMethod;
+import org.example.finalproject.enums.PaymentPurpose;
 import org.example.finalproject.enums.PaymentStatus;
 
 import java.math.BigDecimal;
@@ -23,14 +24,13 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
+    @JoinColumn(name = "users_id")
+    private Users user;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
@@ -46,6 +46,16 @@ public class Payment {
     @Column(name = "status", length = 20)
     private PaymentStatus paymentStatus;
 
-    @Column(length = 100)
-    private String transactionId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "purpose")
+    private PaymentPurpose purpose;
+
+    @Column(name = "card_number", length = 4)
+    private String cardNumber;
+
+    @Column(name = "cvv", length = 3)
+    private String cvv;
+
+    @Column(name = "expire_date", length = 7)
+    private String expireDate;
 }

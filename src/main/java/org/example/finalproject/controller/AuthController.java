@@ -1,33 +1,49 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.example.finalproject.dto.CustomerFinishRegisterDto;
-import org.example.finalproject.dto.CustomerStartDto;
-import org.example.finalproject.dto.CustomerVerifyOtpDto;
+import org.example.finalproject.dto.RegisterFinishDto;
+import org.example.finalproject.dto.RegisterStartDto;
+import org.example.finalproject.dto.RegisterVerifyOtpDto;
 import org.example.finalproject.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/final-project/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth API", description = "Registration and Login endpoints")
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/register/customer/start")
-    public String startRegistration(@RequestBody CustomerStartDto customer) {
-        return authService.startRegistration(customer);
+    @Operation(
+            summary = "Start registration process",
+            description = "User enters email and receives an OTP code"
+    )
+    @PostMapping("/register/start")
+    public String startRegistration(@Valid @RequestBody RegisterStartDto startDto) {
+        return authService.startRegistration(startDto);
     }
 
-    @PostMapping("/register/customer/verify")
-    public String verifyOtp(@RequestBody CustomerVerifyOtpDto dto) {
-        return authService.verifyOtp(dto);
+    @Operation(
+            summary = "Verify OTP code",
+            description = "Verifies the OTP sent to the user's email"
+    )
+    @PostMapping("/register/verify")
+    public String verifyOtp(@Valid @RequestBody RegisterVerifyOtpDto verifyOtpDto) {
+        return authService.verifyOtp(verifyOtpDto);
     }
 
-    @PostMapping("/register/customer/finish")
-    public String finishRegistration(@RequestBody CustomerFinishRegisterDto dto) {
-        return authService.finishRegistration(dto);
+    @Operation(
+            summary = "Complete registration",
+            description = "After verifying OTP, the user enters the data"
+    )
+    @PostMapping("/register/finish")
+    public String finishRegistration(@Valid @RequestBody RegisterFinishDto finishDto) {
+        return authService.finishRegistration(finishDto);
     }
 
     @PostMapping("/login")

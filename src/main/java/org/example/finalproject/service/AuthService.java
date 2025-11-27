@@ -1,16 +1,19 @@
 package org.example.finalproject.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.finalproject.dto.CustomerFinishRegisterDto;
-import org.example.finalproject.dto.CustomerStartDto;
-import org.example.finalproject.dto.CustomerVerifyOtpDto;
+import org.example.finalproject.dto.RegisterFinishDto;
+import org.example.finalproject.dto.RegisterStartDto;
+import org.example.finalproject.dto.RegisterVerifyOtpDto;
+import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.Users;
+import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.OtpNotValidException;
+import org.example.finalproject.exception.WrongPasswordException;
 import org.example.finalproject.jwt.JwtUtil;
-import org.example.finalproject.mapper.CustomerMapper;
-import org.example.finalproject.repository.OtpRepository;
+import org.example.finalproject.mapper.UsersMapper;
+import org.example.finalproject.repository.CustomerRepository;
 import org.example.finalproject.repository.UsersRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +23,13 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UsersRepository usersRepository;
-    private final CustomerMapper customerMapper;
+    private final CustomerRepository customerRepository;
+    private final UsersMapper customerMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final OtpRepository otpRepository;
     private final OtpService otpService;
 
-    public String startRegistration(CustomerStartDto start) {
+    public String startRegistration(RegisterStartDto start) {
 
         if (usersRepository.findByEmail(start.getEmail()).isPresent()) {
             throw new AlreadyExistsException("Email is already in use!");
@@ -35,22 +38,26 @@ public class AuthService {
         return otpService.sendOtp(start.getEmail());
     }
 
-    public String verifyOtp(CustomerVerifyOtpDto verify) {
+    public String verifyOtp(RegisterVerifyOtpDto verify) {
         otpService.verifyOtp(verify.getEmail(), verify.getOtp());
         return "OTP verified!";
     }
 
-    public String finishRegistration(CustomerFinishRegisterDto finish) {
+    public String finishRegistration(RegisterFinishDto finish) {
 
         if (!otpService.isVerified(finish.getEmail())) {
             throw new OtpNotValidException("OTP not verified!");
         }
 
         Users user = customerMapper.toEntity(finish);
-
         user.setPassword(passwordEncoder.encode(finish.getPassword()));
-
+        user.setUserRole(UserRole.ROLE_CUSTOMER);
         usersRepository.save(user);
+
+        Customer customer = Customer.builder()
+                .user(user)
+                .build();
+        customerRepository.save(customer);
 
         otpService.removeOtp(finish.getEmail());
 
@@ -62,7 +69,7 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new WrongPasswordException("Password is Wrong!");
         }
 
         return jwtUtil.generateToken(email);

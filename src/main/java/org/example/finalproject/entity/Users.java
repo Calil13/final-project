@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.finalproject.enums.UserRole;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +34,9 @@ public class Users {
     @Column(nullable = false)
     private String surname;
 
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "user_role", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
@@ -40,5 +44,6 @@ public class Users {
     @Column(name = "card_number")
     private String cardNumber;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

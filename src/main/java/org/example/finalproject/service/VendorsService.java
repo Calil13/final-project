@@ -30,19 +30,30 @@ public class VendorsService {
     private final PaymentRepository paymentRepository;
 
     public String becomeVendor(VendorRequestDTO dto) {
+        //log.info("start method");
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new NotFoundException("Customer not found!"));
+                .orElseThrow(() -> {
+                    log.error("Customer not found!");
+                    return new NotFoundException("Customer not found!");
+                });
 
         Users user = customer.getUser();
 
-        if (user.getUserRole() == UserRole.ROLE_VENDOR) {
-            return  "User is already a vendor!";
+        if (user.getUserRole() == UserRole.VENDOR) {
+            log.error("User is already a vendor!");
+            throw new AlreadyExistsException("User is already a vendor!");
         }
 
         String cardNumber = dto.getCardNumber();
         String cvv = dto.getCvv();
         String expireDate = dto.getExpireDate();
+
+        String validationError = validateCard(cardNumber, cvv, expireDate);
+
+        if (validationError != null) {
+            return "Payment FAILED! \n" + validationError;
+        }
 
         String last4 = dto.getCardNumber().substring(dto.getCardNumber().length() - 4);
         String maskedCvv = "***";
@@ -60,14 +71,6 @@ public class VendorsService {
 
         paymentRepository.save(payment);
 
-        String validationError = validateCard(cardNumber, cvv, expireDate);
-
-        if (validationError != null) {
-            payment.setPaymentStatus(PaymentStatus.FAILED);
-            paymentRepository.save(payment);
-            return "Payment FAILED! " + validationError;
-        }
-
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
 
@@ -79,8 +82,13 @@ public class VendorsService {
 
         vendorRepository.save(vendor);
 
-        user.setUserRole(UserRole.ROLE_VENDOR);
+        user.setUserRole(UserRole.VENDOR);
         usersRepository.save(user);
+
+        Customer oldCustomer = customerRepository.findById(dto.getCustomerId())
+                .orElseThrow();
+
+        customerRepository.delete(oldCustomer);
 
         return "Customer successfully became a VENDOR!";
 

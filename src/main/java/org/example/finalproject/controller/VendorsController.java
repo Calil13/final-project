@@ -1,5 +1,6 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.VendorRequestDTO;
 import org.example.finalproject.service.VendorsService;
@@ -15,6 +16,7 @@ public class VendorsController {
 
     private final VendorsService vendorsService;
 
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/become")
     public String becomeVendor(@RequestBody VendorRequestDTO vendorRequestDTO) {
         return vendorsService.becomeVendor(vendorRequestDTO);

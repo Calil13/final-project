@@ -1,15 +1,18 @@
 package org.example.finalproject.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-        name = "BearerAuth",
-        type = SecuritySchemeType.HTTP,
+        name = "bearerAuth",
+        description = "JWT auth description",
         scheme = "bearer",
-        bearerFormat = "JWT"
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {
 }

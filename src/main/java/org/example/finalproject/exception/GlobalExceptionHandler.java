@@ -115,4 +115,37 @@ public class GlobalExceptionHandler {
 
         return new ExceptionDto(body);
     }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionDto handleTokenExpired(TokenExpiredException e) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Token expired");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionDto handleInvalidToken(InvalidTokenException e) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Invalid token");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handle(Exception e) {
+        e.printStackTrace();
+        return "ERROR";
+    }
 }

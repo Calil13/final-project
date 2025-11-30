@@ -1,5 +1,6 @@
 package org.example.finalproject.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.jwt.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
@@ -29,12 +30,22 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/final-project/auth/register/**",
                                 "/final-project/auth/login",
+                                "/final-project/vendors/become",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers("/final-project/vendors/become").hasRole("CUSTOMER")
+                        .requestMatchers("/final-project/vendors/become").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers("/final-project/vendors/become").hasAuthority("ROLE_VENDOR")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
+                        )
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.setStatus(HttpServletResponse.SC_FORBIDDEN)
+                        )
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

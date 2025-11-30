@@ -36,12 +36,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
+        //System.out.println(authHeader);
 
         String token = null;
         String email = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
+
+            if (!jwtUtil.isValid(token)) {
+                logger.error("Token expired!");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired!");
+                return;
+            }
+
             email = jwtUtil.extractEmail(token);
         }
 
@@ -60,6 +69,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                //System.out.println(authToken);
             }
         }
 

@@ -41,9 +41,6 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    @Column(name = "card_number")
-    private String cardNumber;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

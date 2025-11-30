@@ -51,7 +51,7 @@ public class AuthService {
 
         Users user = customerMapper.toEntity(finish);
         user.setPassword(passwordEncoder.encode(finish.getPassword()));
-        user.setUserRole(UserRole.ROLE_CUSTOMER);
+        user.setUserRole(UserRole.CUSTOMER);
         usersRepository.save(user);
 
         Customer customer = Customer.builder()

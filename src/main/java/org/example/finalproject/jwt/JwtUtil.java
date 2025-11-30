@@ -13,7 +13,7 @@ public class JwtUtil {
     private final String SECRET = "N2YxMzM2NjYtMjE0ZS00Y2Y4LWI1MDktYmU1YjY4YjhjOTk5";
 
     public String generateToken(String email) {
-        long EXPIRATION = 1000 * 60 * 30; return Jwts.builder()
+        long EXPIRATION = 1000 * 60 * 60 * 2; return Jwts.builder()
                 .setSubject(email) .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, SECRET)

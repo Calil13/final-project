@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.entity.OtpCode;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.exception.OtpNotValidException;
+import org.example.finalproject.exception.NotValidException;
 import org.example.finalproject.repository.OtpRepository;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +47,7 @@ public class OtpService {
         }
 
         if (!otp.getOtp().equals(Otp)) {
-            throw new OtpNotValidException("OTP is wrong!");
+            throw new NotValidException("OTP is wrong!");
         }
 
         otp.setVerified(true);

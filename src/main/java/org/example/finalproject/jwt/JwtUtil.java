@@ -12,10 +12,25 @@ public class JwtUtil {
 
     private final String SECRET = "N2YxMzM2NjYtMjE0ZS00Y2Y4LWI1MDktYmU1YjY4YjhjOTk5";
 
-    public String generateToken(String email) {
-        long EXPIRATION = 1000 * 60 * 60 * 2; return Jwts.builder()
-                .setSubject(email) .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+    // 2 saat
+    private final long ACCESS_EXPIRATION = 1000 * 60 * 5;
+    // 30 gün
+    private final long REFRESH_EXPIRATION = 1000 * 60 * 7;
+    //1000L * 60 * 60 * 24 * 30;
+
+    public String generateAccessToken(String email) {
+        return generateToken(email, ACCESS_EXPIRATION);
+    }
+
+    public String generateRefreshToken(String email) {
+        return generateToken(email, REFRESH_EXPIRATION);
+    }
+
+    private String generateToken(String email, long expirationMillis) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(SignatureAlgorithm.HS256, SECRET)
                 .compact();
     }

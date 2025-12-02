@@ -28,15 +28,16 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/final-project/auth/register/**",
-                                "/final-project/auth/login",
-                                "/final-project/vendors/become",
+                                "/auth/register/**",
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/vendors/become",
+                                "/category",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers("/final-project/vendors/become").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers("/final-project/vendors/become").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers("/final-project/vendors/become").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

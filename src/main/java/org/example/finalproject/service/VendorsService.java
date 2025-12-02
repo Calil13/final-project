@@ -19,6 +19,8 @@ import org.example.finalproject.repository.UsersRepository;
 import org.example.finalproject.repository.VendorRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -61,6 +63,7 @@ public class VendorsService {
         Payment payment = Payment.builder()
                 .user(user)
                 .amount(dto.getAmount())
+                .paymentDate(LocalDateTime.now())
                 .paymentMethod(PaymentMethod.CARD)
                 .paymentStatus(PaymentStatus.PENDING)
                 .purpose(PaymentPurpose.VENDOR_SUBSCRIPTION)

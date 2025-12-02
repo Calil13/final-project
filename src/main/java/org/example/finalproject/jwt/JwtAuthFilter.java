@@ -26,7 +26,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         return path.startsWith("/final-project/auth/login") ||
-                path.startsWith("/final-project/auth/register");
+                path.startsWith("/final-project/auth/register") ||
+                path.startsWith("/final-project/auth/refresh");
     }
 
     @Override

@@ -62,13 +62,13 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(body);
     }
 
-    @ExceptionHandler(OtpNotValidException.class)
+    @ExceptionHandler(NotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionDto handleOtpException(OtpNotValidException e) {
+    public ExceptionDto handleValidException(NotValidException e) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Invalid OTP Code");
+        body.put("error", "Valid exception");
         body.put("message", e.getMessage());
         return new ExceptionDto(body);
     }

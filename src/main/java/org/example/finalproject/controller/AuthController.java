@@ -5,14 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.example.finalproject.dto.RegisterFinishDto;
-import org.example.finalproject.dto.RegisterStartDto;
-import org.example.finalproject.dto.RegisterVerifyOtpDto;
+import org.example.finalproject.dto.*;
 import org.example.finalproject.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/final-project/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth API", description = "Registration and Login endpoints")
 public class AuthController {
@@ -47,8 +45,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public AuthResponseDto login(@RequestBody LoginRequest request) {
         return authService.login(request.getEmail(), request.getPassword());
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponseDto refresh(@RequestBody RefreshTokenRequestDto request) {
+        return authService.refreshToken(request);
     }
 
     @Data

@@ -25,4 +25,9 @@ public class ProductImageController {
     public List<ProductImage> uploadImage(@PathVariable Long productId, @RequestParam("files") List<MultipartFile> files) {
         return productImageService.uploadImage(productId, files);
     }
+
+    @DeleteMapping("/{id}")
+    public String  deleteImage(@PathVariable Long id) {
+        return productImageService.deleteImage(id);
+    }
 }

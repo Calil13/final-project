@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.finalproject.jwt.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,17 +29,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
+
                         .requestMatchers(
-                                "/auth/register/**",
-                                "/auth/login",
-                                "/auth/refresh",
-                                "/vendors/become",
-                                "/category",
+                                "/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers("/final-project/vendors/become").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
+                        .requestMatchers("/auth/refresh").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
+                        .requestMatchers("/vendors/become").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

@@ -44,7 +44,7 @@ public class ProductImageService {
     public List<ProductImage> uploadImage(Long productId, List<MultipartFile> files) {
         Products products = productRepository.findById(productId)
                 .orElseThrow(() -> {
-                    log.error("Product not found!");
+                    log.error("Product not found for this images!");
                     return new NotFoundException("Product not found!");
                 });
 
@@ -67,5 +67,22 @@ public class ProductImageService {
         }
 
         return savedImages;
+    }
+
+    public String deleteImage(Long id) {
+        ProductImage image = productImageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Image not found!"));
+
+        String filePath = uploadPath + File.separator
+                + image.getImageUrl().replace("/uploads/", "");
+
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+
+        productImageRepository.delete(image);
+
+        return "Image deleted successfully!";
     }
 }

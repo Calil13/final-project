@@ -69,7 +69,7 @@ public class AuthService {
 
     public AuthResponseDto login(String email, String password) {
         Users user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found. Please register first."));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new WrongPasswordException("Password is Wrong!");

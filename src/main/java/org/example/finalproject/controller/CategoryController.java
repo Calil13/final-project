@@ -1,5 +1,6 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.service.CategoryService;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/category")
+@Tag(name = "Category API")
 public class CategoryController {
 
     private final CategoryService categoryService;

@@ -1,6 +1,7 @@
 package org.example.finalproject.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.VendorRequestDTO;
 import org.example.finalproject.service.VendorsService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/vendors")
+@Tag(name = "Vendors API", description = "Endpoints for Vendor role.")
 public class VendorsController {
 
     private final VendorsService vendorsService;

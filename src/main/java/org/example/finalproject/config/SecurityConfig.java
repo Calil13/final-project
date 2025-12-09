@@ -29,18 +29,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
-                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
-
                         .requestMatchers(
                                 "/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers("/auth/refresh").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/productImage/").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
                         .requestMatchers("/vendors/become").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
                         .anyRequest().authenticated()
                 )

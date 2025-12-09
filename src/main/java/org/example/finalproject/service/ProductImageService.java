@@ -1,6 +1,7 @@
 package org.example.finalproject.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.finalproject.dto.ProductImageDto;
 import org.example.finalproject.entity.ProductImage;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.exception.NotFoundException;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,7 +32,7 @@ public class ProductImageService {
         this.productImageRepository = productImageRepository;
     }
 
-    public List<ProductImage> getProductImages(Long productId) {
+    public List<ProductImageDto> getProductImages(Long productId) {
         List<ProductImage> productImage = productImageRepository.findByProductId(productId);
 
         if (productImage.isEmpty()) {
@@ -38,10 +40,12 @@ public class ProductImageService {
             throw new NotFoundException("Images not found for this product!");
         }
 
-        return productImage;
+        return productImage.stream()
+                .map(img -> new ProductImageDto(img.getId(), img.getImageUrl()))
+                .collect(Collectors.toList());
     }
 
-    public List<ProductImage> uploadImage(Long productId, List<MultipartFile> files) {
+    public List<ProductImageDto> uploadImage(Long productId, List<MultipartFile> files) {
         Products products = productRepository.findById(productId)
                 .orElseThrow(() -> {
                     log.error("Product not found for this images!");
@@ -66,7 +70,9 @@ public class ProductImageService {
             }
         }
 
-        return savedImages;
+        return savedImages.stream()
+                .map(img -> new ProductImageDto(img.getId(), img.getImageUrl()))
+                .collect(Collectors.toList());
     }
 
     public String deleteImage(Long id) {

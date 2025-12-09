@@ -1,23 +1,21 @@
 package org.example.finalproject.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
-import org.example.finalproject.entity.Vendor;
 import org.example.finalproject.service.ProductService;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/product")
-@Tag(name = "Products", description = "Product management endpoints")
+@RequestMapping("/products")
+@Tag(name = "Products API", description = "Product management endpoints")
 public class ProductController {
 
     private final ProductService productService;
@@ -32,13 +30,41 @@ public class ProductController {
     }
 
     @Operation(
+            summary = "Get one products",
+            description = "This endpoint returns one product for id."
+    )
+    @GetMapping("/{id}")
+    public ProductResponseDto getProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
+    }
+
+    @Operation(
+            summary = "Get products by category ID",
+            description = "Returns paginated list of products belonging to a specific category."
+    )
+    @GetMapping("/categories/{id}")
+    public Page<ProductResponseDto> getProductsByCategory(@PathVariable Long id, @ParameterObject Pageable pageable) {
+        return productService.getProductsByCategory(id, pageable);
+    }
+
+    @Operation(
             summary = "Get products by vendor ID",
             description = "Returns paginated list of products belonging to a specific vendor."
     )
-    @GetMapping("/{vendorId}")
+    @GetMapping("/vendor/{vendorId}")
     public Page<ProductResponseDto> getVendorProducts(@PathVariable Long vendorId, @ParameterObject Pageable pageable) {
         return productService.getVendorProducts(vendorId, pageable);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping
+    public ProductRequestDto addProduct(@RequestBody ProductRequestDto requestDto) {
+        return productService.addProduct(requestDto);
+    }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping
+    public ProductRequestDto editProduct(@RequestBody ProductRequestDto requestDto) {
+        return productService.editProduct(requestDto);
+    }
 }

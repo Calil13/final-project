@@ -20,6 +20,6 @@ public class OtpCode {
     private String otp;
     private LocalDateTime expiresAt;
 
-    private boolean verified = false; // OTP təsdiqlənib ya yox
+    private boolean verified = false;
 
 }

@@ -1,5 +1,6 @@
 package org.example.finalproject.repository;
 
+import org.example.finalproject.dto.ProductImageDto;
 import org.example.finalproject.entity.ProductImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 

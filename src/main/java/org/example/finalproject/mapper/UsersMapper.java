@@ -7,6 +7,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface UsersMapper {
 
-    @Mapping(target = "password", ignore = true) // password sonradan set ediləcək
+    @Mapping(target = "password", ignore = true)
     Users toEntity(RegisterFinishDto dto);
 }

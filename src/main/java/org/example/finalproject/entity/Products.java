@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -36,8 +37,6 @@ public class Products {
     @Column(nullable = false)
     private Double price;
 
-    @Column(nullable = false)
-    private Integer stock;
-
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

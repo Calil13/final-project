@@ -16,8 +16,5 @@ public class ProductResponseDto {
     private String name;
     private String description;
     private Double price;
-    private Integer stock;
-    private String categoryName;
-    private String vendorName;
-    private LocalDateTime createdAt;
+    private String storeName;
 }

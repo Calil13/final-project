@@ -10,11 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequestDto {
+    private Long productId;
+    private Long vendorId;
+    private Long categoryId;
     private String name;
     private String description;
     private Double price;
-    private Integer stock;
-    private Long categoryId;
-    //private Long vendorId; - vendor id yə ehtiyac yoxdur çünki,
-    //securiy ilə vendor service class da təyin olunur
 }

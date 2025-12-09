@@ -1,5 +1,6 @@
 package org.example.finalproject.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.*;
 import org.example.finalproject.entity.Customer;
@@ -67,6 +68,7 @@ public class AuthService {
         return "Customer successfully registered!";
     }
 
+    @Transactional
     public AuthResponseDto login(String email, String password) {
         Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found. Please register first."));

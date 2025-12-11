@@ -3,9 +3,11 @@ package org.example.finalproject.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.entity.OtpCode;
+import org.example.finalproject.exception.BadRequestException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.NotValidException;
 import org.example.finalproject.repository.OtpRepository;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,7 +34,11 @@ public class OtpService {
 
         otpRepository.save(otp);
 
-        emailService.sendOtpEmail(email, code);
+        try {
+            emailService.sendOtpEmail(email, code);
+        } catch (MailException e) {
+            throw new BadRequestException("Email is invalid or does not exist");
+        }
 
         return "OTP sent successfully!";
     }

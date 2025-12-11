@@ -1,11 +1,13 @@
 package org.example.finalproject.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -14,15 +16,13 @@ public class JwtUtil {
 
     // 2 saat
     private final long ACCESS_EXPIRATION = 1000 * 60 * 60 * 2;
-    // 30 gün
-    private final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 30;
 
     public String generateAccessToken(String email) {
         return generateToken(email, ACCESS_EXPIRATION);
     }
 
-    public String generateRefreshToken(String email) {
-        return generateToken(email, REFRESH_EXPIRATION);
+    public String generateRefreshToken() {
+        return UUID.randomUUID().toString() + UUID.randomUUID();
     }
 
     private String generateToken(String email, long expirationMillis) {
@@ -35,7 +35,11 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+        try {
+            return getClaims(token).getSubject();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getSubject();
+        }
     }
 
     public boolean isValid(String token) {

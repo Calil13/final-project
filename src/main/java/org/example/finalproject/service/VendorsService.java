@@ -32,7 +32,6 @@ public class VendorsService {
     private final PaymentRepository paymentRepository;
 
     public String becomeVendor(VendorRequestDTO dto) {
-        //log.info("start method");
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> {

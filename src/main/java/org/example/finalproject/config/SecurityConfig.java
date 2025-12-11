@@ -2,6 +2,7 @@ package org.example.finalproject.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.finalproject.exception.GlobalExceptionHandler;
 import org.example.finalproject.jwt.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,15 +45,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/productImage/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/vendors/become").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
+                        .authenticationEntryPoint((request, response, accessDeniedException) ->
+                                GlobalExceptionHandler.unauthorizedResponse(response)
                         )
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.setStatus(HttpServletResponse.SC_FORBIDDEN)
+                                GlobalExceptionHandler.accessDeniedResponse(response)
                         )
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -80,7 +80,7 @@ public class AuthService {
         refreshTokenRepository.deleteByUser(user);
 
         String accessToken = jwtUtil.generateAccessToken(email);
-        String refreshTokenStr = jwtUtil.generateRefreshToken(email);
+        String refreshTokenStr = jwtUtil.generateRefreshToken();
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(refreshTokenStr)
@@ -94,7 +94,7 @@ public class AuthService {
         return new AuthResponseDto(accessToken, refreshTokenStr);
     }
 
-    public AuthResponseDto refreshToken(RefreshTokenRequestDto request) {
+    public AuthResponseDto  refreshToken(RefreshTokenRequestDto request) {
         String oldRefreshTokenStr = request.getRefreshToken();
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshTokenStr)
@@ -104,15 +104,13 @@ public class AuthService {
             throw new NotValidException("Refresh token is invalid or expired");
         }
 
-        String email = jwtUtil.extractEmail(oldRefreshTokenStr);
-
-        Users user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        Users user = storedToken.getUser();
+        String email = user.getEmail();
 
        refreshTokenRepository.delete(storedToken);
 
         String newAccessToken = jwtUtil.generateAccessToken(email);
-        String newRefreshTokenStr = jwtUtil.generateRefreshToken(email);
+        String newRefreshTokenStr = jwtUtil.generateRefreshToken();
 
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .token(newRefreshTokenStr)

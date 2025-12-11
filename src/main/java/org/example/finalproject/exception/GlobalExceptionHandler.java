@@ -41,18 +41,6 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(body);
     }
 
-    @ExceptionHandler(UnexpectedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionDto unexpectedException(UnexpectedException e) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Unexpected Exception");
-        body.put("message", e.getMessage());
-
-        return new ExceptionDto(body);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleIllegalArgument(IllegalArgumentException e) {
@@ -157,6 +145,19 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(body);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleBadRequest(BadRequestException e) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad request");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
     public static void accessDeniedResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json");
@@ -169,6 +170,7 @@ public class GlobalExceptionHandler {
 
         new ObjectMapper().writeValue(response.getOutputStream(), body);
     }
+
 
     public static void unauthorizedResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -184,10 +186,22 @@ public class GlobalExceptionHandler {
     }
 
 
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public String handle(Exception e) {
+//        e.printStackTrace();
+//        return unexpectedException();
+//    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handle(Exception e) {
-        e.printStackTrace();
-        return "ERROR";
+    public ExceptionDto unexpectedException(Exception e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", "Unexpected Exception");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
     }
 }

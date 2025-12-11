@@ -33,7 +33,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
 
-    public String startRegistration(RegisterStartDto start) {
+    public String startRegistration(EmailStartDto start) {
 
         if (usersRepository.findByEmail(start.getEmail()).isPresent()) {
             throw new AlreadyExistsException("Email is already in use!");
@@ -42,7 +42,7 @@ public class AuthService {
         return otpService.sendOtp(start.getEmail());
     }
 
-    public String verifyOtp(RegisterVerifyOtpDto verify) {
+    public String verifyOtp(EmailVerifyOtpDto verify) {
         otpService.verifyOtp(verify.getEmail(), verify.getOtp());
         return "OTP verified!";
     }

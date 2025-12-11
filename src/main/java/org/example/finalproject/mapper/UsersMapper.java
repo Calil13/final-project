@@ -1,7 +1,7 @@
 package org.example.finalproject.mapper;
 
 import org.example.finalproject.dto.RegisterFinishDto;
-import org.example.finalproject.dto.UpdateFullNameRequest;
+import org.example.finalproject.dto.UsersUpdateFullNameRequest;
 import org.example.finalproject.dto.UserResponseDto;
 import org.example.finalproject.entity.Users;
 import org.mapstruct.*;
@@ -24,8 +24,8 @@ public interface UsersMapper {
                 .build();
     }
 
-    default UpdateFullNameRequest toFullNameDto(Users users) {
-        return UpdateFullNameRequest.builder()
+    default UsersUpdateFullNameRequest toFullNameDto(Users users) {
+        return UsersUpdateFullNameRequest.builder()
                 .name(users.getName())
                 .surname(users.getSurname())
                 .build();

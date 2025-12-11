@@ -22,7 +22,7 @@ public class AuthController {
             description = "User enters email and receives an OTP code"
     )
     @PostMapping("/register/start")
-    public String startRegistration(@Valid @RequestBody RegisterStartDto startDto) {
+    public String startRegistration(@Valid @RequestBody EmailStartDto startDto) {
         return authService.startRegistration(startDto);
     }
 
@@ -31,7 +31,7 @@ public class AuthController {
             description = "Verifies the OTP sent to the user's email"
     )
     @PostMapping("/register/verify")
-    public String verifyOtp(@Valid @RequestBody RegisterVerifyOtpDto verifyOtpDto) {
+    public String verifyOtp(@Valid @RequestBody EmailVerifyOtpDto verifyOtpDto) {
         return authService.verifyOtp(verifyOtpDto);
     }
 

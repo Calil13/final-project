@@ -1,9 +1,11 @@
 package org.example.finalproject.dto;
 
+import lombok.Data;
 import org.example.finalproject.validation.ValidEmail;
 
-public class UpdateEmailVerifyOtpDto {
+@Data
+public class EmailVerifyOtpDto {
     @ValidEmail
-    private String newEmail;
+    private String email;
     private String otp;
 }

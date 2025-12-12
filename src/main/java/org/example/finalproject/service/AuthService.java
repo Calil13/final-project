@@ -7,15 +7,13 @@ import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.RefreshToken;
 import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
-import org.example.finalproject.exception.AlreadyExistsException;
-import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.exception.NotValidException;
-import org.example.finalproject.exception.WrongPasswordException;
+import org.example.finalproject.exception.*;
 import org.example.finalproject.jwt.JwtUtil;
 import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.CustomerRepository;
 import org.example.finalproject.repository.RefreshTokenRepository;
 import org.example.finalproject.repository.UsersRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +31,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
 
-    public String startRegistration(EmailStartDto start) {
+    public String startRegistration(EmailSentOtpDto start) {
 
         if (usersRepository.findByEmail(start.getEmail()).isPresent()) {
             throw new AlreadyExistsException("Email is already in use!");
@@ -56,6 +54,7 @@ public class AuthService {
         Users user = customerMapper.toEntity(finish);
         user.setPassword(passwordEncoder.encode(finish.getPassword()));
         user.setUserRole(UserRole.CUSTOMER);
+        user.setPhone("+994" + finish.getPhone());
         usersRepository.save(user);
 
         Customer customer = Customer.builder()
@@ -66,6 +65,75 @@ public class AuthService {
         otpService.removeOtp(finish.getEmail());
 
         return "Customer successfully registered!";
+    }
+
+
+    public AuthResponseDto refreshToken(RefreshTokenRequestDto request) {
+        String oldRefreshTokenStr = request.getRefreshToken();
+
+        RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshTokenStr)
+                .orElseThrow(() -> new NotFoundException("Refresh token not found"));
+
+        if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new NotValidException("Refresh token is invalid or expired");
+        }
+
+        Users user = storedToken.getUser();
+        String email = user.getEmail();
+
+        refreshTokenRepository.delete(storedToken);
+
+        String newAccessToken = jwtUtil.generateAccessToken(email);
+        String newRefreshTokenStr = jwtUtil.generateRefreshToken();
+
+        RefreshToken newRefreshToken = RefreshToken.builder()
+                .token(newRefreshTokenStr)
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusDays(30))
+                .revoked(false)
+                .build();
+
+        refreshTokenRepository.save(newRefreshToken);
+
+        return new AuthResponseDto(newAccessToken, newRefreshTokenStr);
+    }
+
+    public String forgotPassword(EmailSentOtpDto sentOpt) {
+
+        var user = usersRepository.findByEmail(sentOpt.getEmail())
+                .orElseThrow(() -> new NotFoundException("Email not found"));
+
+        return otpService.sendOtp(sentOpt.getEmail());
+    }
+
+    public String verifyEmail(EmailVerifyOtpDto verifyOtp) {
+        otpService.verifyOtp(verifyOtp.getEmail(), verifyOtp.getOtp());
+        return "OTP verified!";
+    }
+
+    public String resetPassword(UsersForgetPasswordDto forgetPassword) {
+
+        var user = usersRepository.findByEmail(forgetPassword.getEmail())
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        if (!otpService.isVerified(forgetPassword.getEmail())) {
+            throw new NotValidException("OTP is not verified!");
+        }
+
+        if (!forgetPassword.getNewPassword().equals(forgetPassword.getConfirmNewPassword())) {
+            throw new WrongPasswordException("Write the new code in the same way!");
+        }
+
+        if (passwordEncoder.matches(forgetPassword.getNewPassword(), user.getPassword())) {
+            throw new WrongPasswordException("New password cannot be same as the old password!");
+        }
+
+        user.setPassword(passwordEncoder.encode(forgetPassword.getNewPassword()));
+        usersRepository.save(user);
+
+        otpService.removeOtp(user.getEmail());
+
+        return "Password updated successfully!";
     }
 
     @Transactional
@@ -92,36 +160,6 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
 
         return new AuthResponseDto(accessToken, refreshTokenStr);
-    }
-
-    public AuthResponseDto  refreshToken(RefreshTokenRequestDto request) {
-        String oldRefreshTokenStr = request.getRefreshToken();
-
-        RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshTokenStr)
-                .orElseThrow(() -> new NotFoundException("Refresh token not found"));
-
-        if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new NotValidException("Refresh token is invalid or expired");
-        }
-
-        Users user = storedToken.getUser();
-        String email = user.getEmail();
-
-       refreshTokenRepository.delete(storedToken);
-
-        String newAccessToken = jwtUtil.generateAccessToken(email);
-        String newRefreshTokenStr = jwtUtil.generateRefreshToken();
-
-        RefreshToken newRefreshToken = RefreshToken.builder()
-                .token(newRefreshTokenStr)
-                .user(user)
-                .expiryDate(LocalDateTime.now().plusDays(30))
-                .revoked(false)
-                .build();
-
-        refreshTokenRepository.save(newRefreshToken);
-
-        return new AuthResponseDto(newAccessToken, newRefreshTokenStr);
     }
 }
 

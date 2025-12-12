@@ -7,5 +7,6 @@ import org.example.finalproject.validation.ValidEmail;
 public class EmailVerifyOtpDto {
     @ValidEmail
     private String email;
+
     private String otp;
 }

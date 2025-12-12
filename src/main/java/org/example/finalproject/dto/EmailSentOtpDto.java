@@ -4,7 +4,7 @@ import lombok.Data;
 import org.example.finalproject.validation.ValidEmail;
 
 @Data
-public class EmailStartDto {
+public class EmailSentOtpDto {
     @ValidEmail
     private String email;
 }

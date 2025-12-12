@@ -96,12 +96,24 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(WrongPasswordException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleWrongPassword(WrongPasswordException e) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Wrong password");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(WrongEmailException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleWrongEmail(WrongEmailException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Wrong email");
         body.put("message", e.getMessage());
 
         return new ExceptionDto(body);

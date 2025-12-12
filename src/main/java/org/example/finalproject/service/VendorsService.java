@@ -2,7 +2,7 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.finalproject.dto.VendorRequestDTO;
+import org.example.finalproject.dto.VendorRequestDto;
 import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.Payment;
 import org.example.finalproject.entity.Users;
@@ -31,7 +31,7 @@ public class VendorsService {
     private final VendorRepository vendorRepository;
     private final PaymentRepository paymentRepository;
 
-    public String becomeVendor(VendorRequestDTO dto) {
+    public String becomeVendor(VendorRequestDto dto) {
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> {

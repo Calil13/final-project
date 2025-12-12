@@ -1,15 +1,14 @@
 package org.example.finalproject.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.finalproject.validation.ValidPhone;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersUpdateFullNameRequest {
-    private String name;
-    private String surname;
+public class UsersUpdatePhoneDto {
+    @ValidPhone
+    String phone;
 }

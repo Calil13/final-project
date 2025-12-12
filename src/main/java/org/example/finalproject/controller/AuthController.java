@@ -1,8 +1,10 @@
 package org.example.finalproject.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.*;
@@ -22,7 +24,7 @@ public class AuthController {
             description = "User enters email and receives an OTP code"
     )
     @PostMapping("/register/start")
-    public String startRegistration(@Valid @RequestBody EmailStartDto startDto) {
+    public String startRegistration(@Valid @RequestBody EmailSentOtpDto startDto) {
         return authService.startRegistration(startDto);
     }
 
@@ -44,14 +46,29 @@ public class AuthController {
         return authService.finishRegistration(finishDto);
     }
 
-    @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody LoginRequest request) {
-        return authService.login(request.getEmail(), request.getPassword());
-    }
-
     @PostMapping("/refresh")
     public AuthResponseDto refresh(@RequestBody RefreshTokenRequestDto request) {
         return authService.refreshToken(request);
+    }
+
+    @PostMapping("/password/forgot")
+    public String forgotPassword(@Valid @RequestBody EmailSentOtpDto sentOtp) {
+        return authService.forgotPassword(sentOtp);
+    }
+
+    @PostMapping("/password/verify")
+    public String verifyEmail(@Valid @RequestBody EmailVerifyOtpDto verifyOtp) {
+        return authService.verifyEmail(verifyOtp);
+    }
+
+    @PostMapping("/password/reset")
+    public String resetPassword(@Valid @RequestBody UsersForgetPasswordDto forgetPasswor) {
+        return authService.resetPassword(forgetPasswor);
+    }
+
+    @PostMapping("/login")
+    public AuthResponseDto login(@RequestBody LoginRequest request) {
+        return authService.login(request.getEmail(), request.getPassword());
     }
 
     @Data

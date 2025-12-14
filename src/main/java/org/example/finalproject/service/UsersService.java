@@ -28,7 +28,7 @@ public class UsersService {
         var user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("User not found!");
-                    return new NotFoundException("User not found");
+                    return new NotFoundException("User not found!");
                 });
 
         return usersMapper.toResponseDto(user);
@@ -36,7 +36,7 @@ public class UsersService {
 
     public UsersUpdateFullNameRequestDto updateFullNameRequest(UsersUpdateFullNameRequestDto update, String email) {
         var user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setName(update.getName());
         user.setSurname(update.getSurname());
@@ -52,7 +52,7 @@ public class UsersService {
                 .getName();
 
         var user = usersRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setPhone("+994" + updatePhone.getPhone());
         usersRepository.save(user);
@@ -64,7 +64,7 @@ public class UsersService {
         var users = usersRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("Email not found!");
-                    return new NotFoundException("Email not found");
+                    return new NotFoundException("Email not found!");
                 });
 
 
@@ -90,7 +90,7 @@ public class UsersService {
                 .getName();
 
         var user = usersRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setEmail(verify.getEmail());
         usersRepository.save(user);
@@ -107,7 +107,7 @@ public class UsersService {
                 .getName();
 
         var user = usersRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(updatePassword.getCurrentPassword(), user.getPassword())) {
             throw new WrongPasswordException("Existing Password is wrong!");
@@ -125,5 +125,23 @@ public class UsersService {
         usersRepository.save(user);
 
         return "Password changed successfully!";
+    }
+
+    public String deleteAccount(UserCheckPassword checkPassword) {
+
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        if (!passwordEncoder.matches(checkPassword.getPassword(), user.getPassword())) {
+            throw new WrongPasswordException("Enter the correct password!");
+        }
+
+        usersRepository.delete(user);
+
+        return "Account deleted!";
     }
 }

@@ -67,14 +67,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody LoginRequest request) {
+    public AuthResponseDto login(@Valid @RequestBody LoginRequestDto request) {
         return authService.login(request.getEmail(), request.getPassword());
     }
 
-    @Data
-    static class LoginRequest {
-        private String email;
-        private String password;
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/logout")
+    public String logout( @Valid @RequestBody LogoutRequestDto request) {
+        return authService.logout(request);
     }
 }
 

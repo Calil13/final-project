@@ -43,4 +43,6 @@ public class Users {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private Boolean isActive;
 }

@@ -2,6 +2,7 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.finalproject.dto.VendorChangeStoreNameDto;
 import org.example.finalproject.dto.VendorRequestDto;
 import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.Payment;
@@ -13,10 +14,8 @@ import org.example.finalproject.enums.PaymentStatus;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.repository.CustomerRepository;
-import org.example.finalproject.repository.PaymentRepository;
-import org.example.finalproject.repository.UsersRepository;
-import org.example.finalproject.repository.VendorRepository;
+import org.example.finalproject.repository.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +29,7 @@ public class VendorsService {
     private final UsersRepository usersRepository;
     private final VendorRepository vendorRepository;
     private final PaymentRepository paymentRepository;
+    private final ProductsRepository productRepository;
 
     public String becomeVendor(VendorRequestDto dto) {
 
@@ -79,7 +79,6 @@ public class VendorsService {
         Vendor vendor = Vendor.builder()
                 .user(user)
                 .storeName(dto.getStoreName())
-                .isActive(true)
                 .build();
 
         vendorRepository.save(vendor);
@@ -111,5 +110,23 @@ public class VendorsService {
         }
 
         return null;
+    }
+
+    public String changeStoreName(VendorChangeStoreNameDto changeStoreName) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var vendor = vendorRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Vendor not found!"));
+
+        vendor.setStoreName(changeStoreName.getStoreName());
+
+        vendorRepository.save(vendor);
+
+        return "Store name successfully updated!";
     }
 }

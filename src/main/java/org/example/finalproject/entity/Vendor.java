@@ -24,6 +24,4 @@ public class Vendor {
 
     @Column(name = "store_name")
     private String storeName;
-
-    private Boolean isActive;
 }

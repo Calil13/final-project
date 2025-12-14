@@ -24,6 +24,7 @@ public interface UsersMapper {
                 .phone(user.getPhone())
                 .userRole(user.getUserRole().name())
                 .createdAt(user.getCreatedAt())
+                .isActive(user.getIsActive())
                 .build();
     }
 

@@ -4,13 +4,13 @@ import org.example.finalproject.entity.ProductImage
 import org.example.finalproject.entity.Products
 import org.example.finalproject.exception.NotFoundException
 import org.example.finalproject.repository.ProductImageRepository
-import org.example.finalproject.repository.ProductRepository
+import org.example.finalproject.repository.ProductsRepository
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
 
 class ProductImageServiceTest extends Specification {
 
-    ProductRepository productRepository = Mock()
+    ProductsRepository productRepository = Mock()
     ProductImageRepository productImageRepository = Mock()
 
     ProductImageService service

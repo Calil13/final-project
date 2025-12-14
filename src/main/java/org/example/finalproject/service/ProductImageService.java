@@ -6,7 +6,7 @@ import org.example.finalproject.entity.ProductImage;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.repository.ProductImageRepository;
-import org.example.finalproject.repository.ProductRepository;
+import org.example.finalproject.repository.ProductsRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,10 +24,10 @@ public class ProductImageService {
     @Value("${upload.path}")
     private String uploadPath;
 
-    private final ProductRepository productRepository;
+    private final ProductsRepository productRepository;
     private final ProductImageRepository productImageRepository;
 
-    public ProductImageService(ProductRepository productRepository, ProductImageRepository productImageRepository) {
+    public ProductImageService(ProductsRepository productRepository, ProductImageRepository productImageRepository) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
     }

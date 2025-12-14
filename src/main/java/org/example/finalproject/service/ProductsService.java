@@ -6,26 +6,30 @@ import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
+import org.example.finalproject.entity.Users;
 import org.example.finalproject.entity.Vendor;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.CategoryRepository;
-import org.example.finalproject.repository.ProductRepository;
+import org.example.finalproject.repository.ProductsRepository;
+import org.example.finalproject.repository.UsersRepository;
 import org.example.finalproject.repository.VendorRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ProductService {
+public class ProductsService {
 
-    private final ProductRepository productRepository;
+    private final ProductsRepository productRepository;
     private final ProductsMapper productsMapper;
     private final VendorRepository vendorRepository;
     private final CategoryRepository categoryRepository;
+    private final UsersRepository usersRepository;
 
     public Page<ProductResponseDto> getProducts(Pageable pageable) {
         Page<Products> productsPage = productRepository.findAll(pageable);
@@ -116,5 +120,29 @@ public class ProductService {
         productRepository.save(product);
 
         return productsMapper.toDtoRequest(product);
+    }
+
+    public String deleteProduct(Long id) {
+
+        String vendorEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(vendorEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var vendor = vendorRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Vendor not found!"));
+
+        var product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
+
+        if (!product.getVendor().getId().equals(vendor.getId())) {
+            throw new AccessDeniedException("You are not allowed to delete this product!");
+        }
+
+        productRepository.delete(product);
+
+        return "Product deleted successfully!";
     }
 }

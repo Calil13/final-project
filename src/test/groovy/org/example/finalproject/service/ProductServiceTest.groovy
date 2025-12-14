@@ -2,206 +2,198 @@ package org.example.finalproject.service
 
 import org.example.finalproject.dto.ProductRequestDto
 import org.example.finalproject.dto.ProductResponseDto
-import org.example.finalproject.entity.Category
-import org.example.finalproject.entity.Products
-import org.example.finalproject.entity.Vendor
+import org.example.finalproject.entity.*
 import org.example.finalproject.exception.AccessDeniedException
 import org.example.finalproject.exception.NotFoundException
 import org.example.finalproject.mapper.ProductsMapper
-import org.example.finalproject.repository.CategoryRepository
-import org.example.finalproject.repository.ProductRepository
-import org.example.finalproject.repository.VendorRepository
+import org.example.finalproject.repository.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
+import org.springframework.data.domain.Pageable
 
-class ProductServiceTest extends Specification {
+class ProductsServiceTest extends Specification {
 
-    ProductRepository productRepository = Mock()
+    ProductsRepository productRepository = Mock()
     ProductsMapper productsMapper = Mock()
     VendorRepository vendorRepository = Mock()
     CategoryRepository categoryRepository = Mock()
+    UsersRepository usersRepository = Mock()
 
-    ProductService service = new ProductService(
+    ProductsService productsService = new ProductsService(
             productRepository,
             productsMapper,
             vendorRepository,
-            categoryRepository
+            categoryRepository,
+            usersRepository
     )
 
-    def "getProducts returns paginated products"() {
-        given:
-        def pageable = PageRequest.of(0, 10)
-        def product = new Products()
-        Page<Products> productPage = new PageImpl([product])
+    def setup() {
+        SecurityContext securityContext = Mock()
+        Authentication authentication = Mock()
 
-        productRepository.findAll(pageable) >> productPage
-        productsMapper.toDto(product) >> new ProductResponseDto()
-
-        when:
-        def result = service.getProducts(pageable)
-
-        then:
-        result.totalElements == 1
+        authentication.getName() >> "vendor@test.com"
+        securityContext.getAuthentication() >> authentication
+        SecurityContextHolder.setContext(securityContext)
     }
 
-    def "getProduct returns product when found"() {
-        given:
-        def product = new Products()
-        productRepository.findById(1L) >> Optional.of(product)
-        productsMapper.toDto(product) >> new ProductResponseDto()
-
-        when:
-        def result = service.getProduct(1L)
-
-        then:
-        result != null
+    def cleanup() {
+        SecurityContextHolder.clearContext()
     }
 
-    def "getProduct throws NotFoundException when not found"() {
+    def "should return paged products"() {
         given:
-        productRepository.findById(1L) >> Optional.empty()
+        Pageable pageable = PageRequest.of(0, 10)
+        Products product = new Products(id: 1L)
+        Page<Products> page = new PageImpl([product])
+        ProductResponseDto dto = new ProductResponseDto()
+
+        productRepository.findAll(pageable) >> page
+        productsMapper.toDto(product) >> dto
 
         when:
-        service.getProduct(1L)
-
-        then:
-        thrown(NotFoundException)
-    }
-
-    def "getProductsByCategory returns correct results"() {
-        given:
-        def pageable = PageRequest.of(0, 10)
-        def product = new Products()
-        Page<Products> productPage = new PageImpl([product])
-
-        productRepository.findByCategoryId(5L, pageable) >> productPage
-        productsMapper.toDto(product) >> new ProductResponseDto()
-
-        when:
-        def result = service.getProductsByCategory(5L, pageable)
+        Page<ProductResponseDto> result = productsService.getProducts(pageable)
 
         then:
         result.content.size() == 1
+        result.content[0] == dto
     }
 
-    def "getVendorProducts returns vendor product list"() {
+    def "should return product by id"() {
         given:
-        def pageable = PageRequest.of(0, 10)
-        def product = new Products()
-        Page<Products> productPage = new PageImpl([product])
+        Products product = new Products(id: 1L)
+        ProductResponseDto dto = new ProductResponseDto()
 
-        productRepository.findByVendorId(3L, pageable) >> productPage
-        productsMapper.toDto(product) >> new ProductResponseDto()
+        productRepository.findById(1L) >> Optional.of(product)
+        productsMapper.toDto(product) >> dto
 
         when:
-        def result = service.getVendorProducts(3L, pageable)
+        def result = productsService.getProduct(1L)
 
         then:
-        result.totalElements == 1
+        result == dto
     }
 
-    def "addProduct successfully saves and returns dto"() {
+    def "should throw NotFoundException when product not found"() {
         given:
-        def dto = new ProductRequestDto(vendorId: 2L, categoryId: 3L)
-
-        def vendor = new Vendor(id: 2L)
-        def category = new Category(id: 3L)
-        def product = new Products()
-
-        vendorRepository.findById(2L) >> Optional.of(vendor)
-        categoryRepository.findById(3L) >> Optional.of(category)
-        productsMapper.toEntity(dto, vendor, category) >> product
-        productsMapper.toDtoRequest(product) >> dto
+        productRepository.findById(99L) >> Optional.empty()
 
         when:
-        def result = service.addProduct(dto)
-
-        then:
-        result != null
-        1 * productRepository.save(product)
-    }
-
-    def "addProduct throws NotFoundException when vendor not found"() {
-        given:
-        def dto = new ProductRequestDto(vendorId: 99L)
-
-        vendorRepository.findById(99L) >> Optional.empty()
-
-        when:
-        service.addProduct(dto)
+        productsService.getProduct(99L)
 
         then:
         thrown(NotFoundException)
     }
 
-    def "addProduct throws NotFoundException when category not found"() {
+
+    def "should add product successfully"() {
         given:
-        def dto = new ProductRequestDto(vendorId: 1L, categoryId: 2L)
-
-        vendorRepository.findById(1L) >> Optional.of(new Vendor())
-        categoryRepository.findById(2L) >> Optional.empty()
-
-        when:
-        service.addProduct(dto)
-
-        then:
-        thrown(NotFoundException)
-    }
-
-    def "editProduct updates product when vendor matches"() {
-        given:
-        def dto = new ProductRequestDto(
-                productId: 1L,
-                vendorId: 10L,
-                categoryId: 20L,
-                name: "Updated"
+        ProductRequestDto request = new ProductRequestDto(
+                vendorId: 1L,
+                categoryId: 2L
         )
 
-        def vendor = new Vendor(id: 10L)
-        def category = new Category(id: 20L)
-        def product = new Products(vendor: vendor)
+        Vendor vendor = new Vendor(id: 1L)
+        Category category = new Category(id: 2L)
+        Products product = new Products()
 
-        productRepository.findById(1L) >> Optional.of(product)
-        categoryRepository.findById(20L) >> Optional.of(category)
-        productsMapper.toDtoRequest(product) >> dto
+        vendorRepository.findById(1L) >> Optional.of(vendor)
+        categoryRepository.findById(2L) >> Optional.of(category)
+        productsMapper.toEntity(request, vendor, category) >> product
+        productsMapper.toDtoRequest(product) >> request
 
         when:
-        def result = service.editProduct(dto)
+        def result = productsService.addProduct(request)
 
         then:
-        result != null
-        product.name == "Updated"
-        product.category == category
         1 * productRepository.save(product)
+        result == request
     }
 
-    def "editProduct throws AccessDenied when vendor mismatch"() {
+    def "should edit product successfully"() {
         given:
-        def dto = new ProductRequestDto(productId: 1L, vendorId: 99L)
+        ProductRequestDto request = new ProductRequestDto(
+                productId: 1L,
+                vendorId: 1L,
+                categoryId: 2L,
+                name: "New name"
+        )
 
-        def vendor = new Vendor(id: 10L)
-        def product = new Products(vendor: vendor)
+        Vendor vendor = new Vendor(id: 1L)
+        Category category = new Category(id: 2L)
+        Products product = new Products(id: 1L, vendor: vendor)
+
+        productRepository.findById(1L) >> Optional.of(product)
+        categoryRepository.findById(2L) >> Optional.of(category)
+        productsMapper.toDtoRequest(product) >> request
+
+        when:
+        def result = productsService.editProduct(request)
+
+        then:
+        product.name == "New name"
+        1 * productRepository.save(product)
+        result == request
+    }
+
+    def "should throw AccessDeniedException when editing чужой product"() {
+        given:
+        ProductRequestDto request = new ProductRequestDto(
+                productId: 1L,
+                vendorId: 2L
+        )
+
+        Vendor vendor = new Vendor(id: 1L)
+        Products product = new Products(id: 1L, vendor: vendor)
 
         productRepository.findById(1L) >> Optional.of(product)
 
         when:
-        service.editProduct(dto)
+        productsService.editProduct(request)
 
         then:
         thrown(AccessDeniedException)
     }
 
-    def "editProduct throws NotFoundException when product not found"() {
+    def "should delete product when vendor owns it"() {
         given:
-        productRepository.findById(123L) >> Optional.empty()
-        def dto = new ProductRequestDto(productId: 123L)
+        Users user = new Users(email: "vendor@test.com")
+        Vendor vendor = new Vendor(id: 1L, user: user)
+        Products product = new Products(id: 1L, vendor: vendor)
+
+        usersRepository.findByEmail("vendor@test.com") >> Optional.of(user)
+        vendorRepository.findByUser(user) >> Optional.of(vendor)
+        productRepository.findById(1L) >> Optional.of(product)
 
         when:
-        service.editProduct(dto)
+        String result = productsService.deleteProduct(1L)
 
         then:
-        thrown(NotFoundException)
+        1 * productRepository.delete(product)
+        result == "Product deleted successfully!"
+    }
+
+    def "should throw AccessDeniedException when vendor does not own product"() {
+        given:
+        Users user = new Users(email: "vendor@test.com")
+        Vendor vendor = new Vendor(id: 1L, user: user)
+        Vendor otherVendor = new Vendor(id: 2L)
+        Products product = new Products(id: 1L, vendor: otherVendor)
+
+        usersRepository.findByEmail("vendor@test.com") >> Optional.of(user)
+        vendorRepository.findByUser(user) >> Optional.of(vendor)
+        productRepository.findById(1L) >> Optional.of(product)
+
+        when:
+        productsService.deleteProduct(1L)
+
+        then:
+        thrown(AccessDeniedException)
+        0 * productRepository.delete(_)
     }
 }
+

@@ -31,16 +31,18 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/auth/login",
+                                "/auth/register/**",
+                                "/auth/refreshToken",
+                                "/auth/password/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/auth/logout").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")
-                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/products/").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/productImage/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_VENDOR")

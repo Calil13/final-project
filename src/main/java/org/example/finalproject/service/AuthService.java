@@ -157,9 +157,32 @@ public class AuthService {
                 .revoked(false)
                 .build();
 
+        user.setIsActive(true);
         refreshTokenRepository.save(refreshToken);
 
         return new AuthResponseDto(accessToken, refreshTokenStr);
+    }
+
+    @Transactional
+    public String logout(LogoutRequestDto logoutRequest) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        if (!passwordEncoder.matches(logoutRequest.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Password is incorrect");
+        }
+
+        var token = refreshTokenRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Refresh token not found!"));
+
+        refreshTokenRepository.deleteByToken(token.getToken());
+        user.setIsActive(false);
+
+        return "Logged out successfully!";
     }
 }
 

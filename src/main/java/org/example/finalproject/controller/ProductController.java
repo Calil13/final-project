@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
-import org.example.finalproject.service.ProductService;
+import org.example.finalproject.service.ProductsService;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Products API", description = "Product management endpoints")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductsService productService;
 
     @Operation(
             summary = "Get all products",
@@ -66,5 +66,11 @@ public class ProductController {
     @PatchMapping
     public ProductRequestDto editProduct(@RequestBody ProductRequestDto requestDto) {
         return productService.editProduct(requestDto);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+        return productService.deleteProduct(id);
     }
 }

@@ -3,12 +3,10 @@ package org.example.finalproject.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.example.finalproject.dto.VendorChangeStoreNameDto;
 import org.example.finalproject.dto.VendorRequestDto;
 import org.example.finalproject.service.VendorsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -22,5 +20,11 @@ public class VendorsController {
     @PostMapping("/become")
     public String becomeVendor(@RequestBody VendorRequestDto vendorRequestDTO) {
         return vendorsService.becomeVendor(vendorRequestDTO);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping("/change/store-name")
+    public String changeStoreName(VendorChangeStoreNameDto changeStoreName) {
+        return vendorsService.changeStoreName(changeStoreName);
     }
 }

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Data
 public class OwnerRequestDto {
 
-    private Long customerId;
+    private Long userId;
 
     private String cardNumber;
     private String cvv;

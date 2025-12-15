@@ -23,7 +23,7 @@ public class Favorites {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private Users customer;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

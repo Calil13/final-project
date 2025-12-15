@@ -23,7 +23,7 @@ public class Products {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private Owner owner;
+    private Users owner;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

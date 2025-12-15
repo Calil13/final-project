@@ -61,4 +61,10 @@ public class UsersController {
     public String deleteAccount(@RequestBody UserCheckPassword checkPassword) {
         return usersService.deleteAccount(checkPassword);
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/become")
+    public String becomeOwner(@RequestBody OwnerRequestDto ownerRequestDTO) {
+        return usersService.becomeOwner(ownerRequestDTO);
+    }
 }

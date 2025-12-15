@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.finalproject.entity.Users;
 
 import java.time.LocalDateTime;
 
@@ -16,5 +17,5 @@ public class ProductResponseDto {
     private String name;
     private String description;
     private Double price;
-    private String storeName;
+    private String address;
 }

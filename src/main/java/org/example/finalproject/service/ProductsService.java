@@ -6,14 +6,13 @@ import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
-import org.example.finalproject.entity.Owner;
+import org.example.finalproject.entity.Users;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.CategoryRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
-import org.example.finalproject.repository.OwnerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +25,6 @@ public class ProductsService {
 
     private final ProductsRepository productRepository;
     private final ProductsMapper productsMapper;
-    private final OwnerRepository vendorRepository;
     private final CategoryRepository categoryRepository;
     private final UsersRepository usersRepository;
 
@@ -50,7 +48,6 @@ public class ProductsService {
                 .map(productsMapper::toDto);
     }
 
-
     public Page<ProductResponseDto> getOwnerProducts(Long ownerId, Pageable pageable) {
 
         Page<Products> products = productRepository.findByOwnerId(ownerId, pageable);
@@ -64,7 +61,7 @@ public class ProductsService {
 
     public ProductRequestDto addProduct(ProductRequestDto requestDto) {
 
-        Owner owner = vendorRepository.findById(requestDto.getOwnerId())
+        Users owner = usersRepository.findById(requestDto.getOwnerId())
                 .orElseThrow(() -> {
                     log.error("Owner not found with id: {}", requestDto.getOwnerId());
                     return new NotFoundException("Owner not found");
@@ -130,13 +127,10 @@ public class ProductsService {
         var user = usersRepository.findByEmail(vendorEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var vendor = vendorRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Vendor not found!"));
-
         var product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found!"));
 
-        if (!product.getOwner().getId().equals(vendor.getId())) {
+        if (!product.getOwner().getId().equals(user.getId())) {
             throw new AccessDeniedException("You are not allowed to delete this product!");
         }
 

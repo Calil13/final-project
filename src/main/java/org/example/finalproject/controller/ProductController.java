@@ -56,12 +56,22 @@ public class ProductController {
         return productService.getOwnerProducts(ownerId, pageable);
     }
 
+    @Operation(
+            summary = "Add new product",
+            description = "Creates a new product for the authenticated OWNER user. " +
+                    "Only users with OWNER role are allowed to add products."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     public ProductRequestDto addProduct(@RequestBody ProductRequestDto requestDto) {
         return productService.addProduct(requestDto);
     }
 
+    @Operation(
+            summary = "Edit existing product",
+            description = "Updates an existing product owned by the authenticated OWNER user. " +
+                    "Only the product owner is allowed to modify product details."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping
     public ProductRequestDto editProduct(@RequestBody ProductRequestDto requestDto) {

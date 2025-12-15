@@ -3,14 +3,12 @@ package org.example.finalproject.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.*;
-import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.RefreshToken;
 import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.*;
 import org.example.finalproject.jwt.JwtUtil;
 import org.example.finalproject.mapper.UsersMapper;
-import org.example.finalproject.repository.CustomerRepository;
 import org.example.finalproject.repository.RefreshTokenRepository;
 import org.example.finalproject.repository.UsersRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +22,6 @@ import java.time.LocalDateTime;
 public class AuthService {
 
     private final UsersRepository usersRepository;
-    private final CustomerRepository customerRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UsersMapper customerMapper;
     private final PasswordEncoder passwordEncoder;
@@ -56,11 +53,6 @@ public class AuthService {
         user.setUserRole(UserRole.CUSTOMER);
         user.setPhone("+994" + finish.getPhone());
         usersRepository.save(user);
-
-        Customer customer = Customer.builder()
-                .user(user)
-                .build();
-        customerRepository.save(customer);
 
         otpService.removeOtp(finish.getEmail());
 

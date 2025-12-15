@@ -4,7 +4,8 @@ import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
-import org.example.finalproject.entity.Owner;
+import org.example.finalproject.entity.Users;
+import org.example.finalproject.repository.UsersRepository;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
@@ -16,12 +17,13 @@ public interface ProductsMapper {
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .address(product.getOwner().getAddress())
                 .build();
     }
 
     ProductRequestDto toDtoRequest(Products products);
 
-    default Products toEntity(ProductRequestDto dto, Owner owner, Category category) {
+    default Products toEntity(ProductRequestDto dto, Users owner, Category category) {
         Products product = new Products();
 
         product.setOwner(owner);

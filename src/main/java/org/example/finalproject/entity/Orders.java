@@ -5,29 +5,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import org.example.finalproject.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customers")
+@Table(name = "orders")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Customer {
+public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Users customer;
 
-    private String address;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate = LocalDateTime.now();
 
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(length = 20)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 }

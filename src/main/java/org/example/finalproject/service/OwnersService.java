@@ -2,12 +2,11 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.finalproject.dto.VendorChangeStoreNameDto;
-import org.example.finalproject.dto.VendorRequestDto;
+import org.example.finalproject.dto.OwnerRequestDto;
 import org.example.finalproject.entity.Customer;
 import org.example.finalproject.entity.Payment;
 import org.example.finalproject.entity.Users;
-import org.example.finalproject.entity.Vendor;
+import org.example.finalproject.entity.Owner;
 import org.example.finalproject.enums.PaymentMethod;
 import org.example.finalproject.enums.PaymentPurpose;
 import org.example.finalproject.enums.PaymentStatus;
@@ -23,15 +22,15 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class VendorsService {
+public class OwnersService {
 
     private final CustomerRepository customerRepository;
     private final UsersRepository usersRepository;
-    private final VendorRepository vendorRepository;
+    private final OwnerRepository vendorRepository;
     private final PaymentRepository paymentRepository;
     private final ProductsRepository productRepository;
 
-    public String becomeVendor(VendorRequestDto dto) {
+    public String becomeOwner(OwnerRequestDto dto) {
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> {
@@ -41,9 +40,9 @@ public class VendorsService {
 
         Users user = customer.getUser();
 
-        if (user.getUserRole() == UserRole.VENDOR) {
-            log.error("User is already a vendor!");
-            throw new AlreadyExistsException("User is already a vendor!");
+        if (user.getUserRole() == UserRole.OWNER) {
+            log.error("User is already a owner!");
+            throw new AlreadyExistsException("User is already a owner!");
         }
 
         String cardNumber = dto.getCardNumber();
@@ -65,7 +64,7 @@ public class VendorsService {
                 .paymentDate(LocalDateTime.now())
                 .paymentMethod(PaymentMethod.CARD)
                 .paymentStatus(PaymentStatus.PENDING)
-                .purpose(PaymentPurpose.VENDOR_SUBSCRIPTION)
+                .purpose(PaymentPurpose.OWNER_SUBSCRIPTION)
                 .cardNumber(last4)
                 .cvv(maskedCvv)
                 .expireDate(dto.getExpireDate())
@@ -76,14 +75,13 @@ public class VendorsService {
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
 
-        Vendor vendor = Vendor.builder()
+        Owner vendor = Owner.builder()
                 .user(user)
-                .storeName(dto.getStoreName())
                 .build();
 
         vendorRepository.save(vendor);
 
-        user.setUserRole(UserRole.VENDOR);
+        user.setUserRole(UserRole.OWNER);
         usersRepository.save(user);
 
         Customer oldCustomer = customerRepository.findById(dto.getCustomerId())
@@ -91,7 +89,7 @@ public class VendorsService {
 
         customerRepository.delete(oldCustomer);
 
-        return "Customer successfully became a VENDOR!";
+        return "Customer successfully became a OWNER!";
 
     }
 
@@ -110,23 +108,5 @@ public class VendorsService {
         }
 
         return null;
-    }
-
-    public String changeStoreName(VendorChangeStoreNameDto changeStoreName) {
-        String currentEmail = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
-
-        var user = usersRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new NotFoundException("User not found!"));
-
-        var vendor = vendorRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Vendor not found!"));
-
-        vendor.setStoreName(changeStoreName.getStoreName());
-
-        vendorRepository.save(vendor);
-
-        return "Store name successfully updated!";
     }
 }

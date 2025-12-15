@@ -72,10 +72,10 @@ public class AuthService {
         String oldRefreshTokenStr = request.getRefreshToken();
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshTokenStr)
-                .orElseThrow(() -> new NotFoundException("Refresh token not found"));
+                .orElseThrow(() -> new NotFoundException("Refresh token not found!"));
 
         if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new NotValidException("Refresh token is invalid or expired");
+            throw new NotValidException("Refresh token is invalid or expired!");
         }
 
         Users user = storedToken.getUser();
@@ -101,7 +101,7 @@ public class AuthService {
     public String forgotPassword(EmailSentOtpDto sentOpt) {
 
         var user = usersRepository.findByEmail(sentOpt.getEmail())
-                .orElseThrow(() -> new NotFoundException("Email not found"));
+                .orElseThrow(() -> new NotFoundException("Email not found!"));
 
         return otpService.sendOtp(sentOpt.getEmail());
     }

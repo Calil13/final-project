@@ -5,10 +5,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class VendorRequestDto {
+public class OwnerRequestDto {
 
     private Long customerId;
-    private String storeName;
 
     private String cardNumber;
     private String cvv;

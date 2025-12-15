@@ -58,7 +58,7 @@ public class CategoryService {
 
     public void addSubcategory(Long id, CategoryDto subCategory) {
         Category parentCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Parent category not found"));
+                .orElseThrow(() -> new NotFoundException("Parent category not found!"));
 
         Category newSubCategory = categoryMapper.toEntity(subCategory, parentCategory);
 
@@ -77,8 +77,8 @@ public class CategoryService {
         if (categoryDto.getName() != null) {
             editCategory.setName(categoryDto.getName());
         } else {
-            log.error("JSON format is wrong");
-            throw new UnexpectedException("JSON only accepts a name parameter");
+            log.error("JSON format is wrong!");
+            throw new UnexpectedException("JSON only accepts a name parameter!");
         }
 
         categoryRepository.save(editCategory);
@@ -88,8 +88,8 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         var category =  categoryRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Category with id {} not found", id);
-                    return new NotFoundException("Category not found");
+                    log.error("Category with id {} not found :", id);
+                    return new NotFoundException("Category not found!");
                 });
 
         categoryRepository.delete(category);

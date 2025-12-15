@@ -22,8 +22,8 @@ public class Products {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

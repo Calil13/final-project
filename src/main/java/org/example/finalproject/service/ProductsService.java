@@ -6,15 +6,14 @@ import org.example.finalproject.dto.ProductRequestDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
-import org.example.finalproject.entity.Users;
-import org.example.finalproject.entity.Vendor;
+import org.example.finalproject.entity.Owner;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.CategoryRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
-import org.example.finalproject.repository.VendorRepository;
+import org.example.finalproject.repository.OwnerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +26,7 @@ public class ProductsService {
 
     private final ProductsRepository productRepository;
     private final ProductsMapper productsMapper;
-    private final VendorRepository vendorRepository;
+    private final OwnerRepository vendorRepository;
     private final CategoryRepository categoryRepository;
     private final UsersRepository usersRepository;
 
@@ -52,12 +51,12 @@ public class ProductsService {
     }
 
 
-    public Page<ProductResponseDto> getVendorProducts(Long vendorId, Pageable pageable) {
+    public Page<ProductResponseDto> getOwnerProducts(Long ownerId, Pageable pageable) {
 
-        Page<Products> products = productRepository.findByVendorId(vendorId, pageable);
+        Page<Products> products = productRepository.findByOwnerId(ownerId, pageable);
 
         if (products.isEmpty()) {
-            log.warn("Vendor has no products: {}", vendorId);
+            log.warn("Owner has no products: {}", ownerId);
         }
 
         return products.map(productsMapper::toDto);
@@ -65,10 +64,10 @@ public class ProductsService {
 
     public ProductRequestDto addProduct(ProductRequestDto requestDto) {
 
-        Vendor vendor = vendorRepository.findById(requestDto.getVendorId())
+        Owner owner = vendorRepository.findById(requestDto.getOwnerId())
                 .orElseThrow(() -> {
-                    log.error("Vendor not found with id: {}", requestDto.getVendorId());
-                    return new NotFoundException("Vendor not found");
+                    log.error("Owner not found with id: {}", requestDto.getOwnerId());
+                    return new NotFoundException("Owner not found");
                 });
 
         Category category = categoryRepository.findById(requestDto.getCategoryId())
@@ -77,7 +76,7 @@ public class ProductsService {
                     return new NotFoundException("Category not found");
                 });
 
-        Products products = productsMapper.toEntity(requestDto, vendor, category);
+        Products products = productsMapper.toEntity(requestDto, owner, category);
 
         productRepository.save(products);
 
@@ -88,17 +87,17 @@ public class ProductsService {
         var product = productRepository.findById(requestDto.getProductId())
                 .orElseThrow(() -> {
                     log.error("Product not found: {}", requestDto.getProductId());
-                    return new NotFoundException("Product not found");
+                    return new NotFoundException("Product not found!");
                 });
 
-        if(!product.getVendor().getId().equals(requestDto.getVendorId())) {
+        if(!product.getOwner().getId().equals(requestDto.getOwnerId())) {
             throw new AccessDeniedException("You can only edit your own products");
         }
 
         var category = categoryRepository.findById(requestDto.getCategoryId())
                 .orElseThrow(() -> {
                     log.error("Category not found: {}", requestDto.getCategoryId());
-                    return new  NotFoundException("Category not found");
+                    return new  NotFoundException("Category not found!");
                 });
 
         if (requestDto.getCategoryId() != null) {
@@ -137,7 +136,7 @@ public class ProductsService {
         var product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found!"));
 
-        if (!product.getVendor().getId().equals(vendor.getId())) {
+        if (!product.getOwner().getId().equals(vendor.getId())) {
             throw new AccessDeniedException("You are not allowed to delete this product!");
         }
 

@@ -48,12 +48,12 @@ public class ProductController {
     }
 
     @Operation(
-            summary = "Get products by vendor ID",
-            description = "Returns paginated list of products belonging to a specific vendor."
+            summary = "Get products by owner ID",
+            description = "Returns paginated list of products belonging to a specific owner."
     )
-    @GetMapping("/vendor/{vendorId}")
-    public Page<ProductResponseDto> getVendorProducts(@PathVariable Long vendorId, @ParameterObject Pageable pageable) {
-        return productService.getVendorProducts(vendorId, pageable);
+    @GetMapping("/owner/{ownerId}")
+    public Page<ProductResponseDto> getOwnerProducts(@PathVariable Long ownerId, @ParameterObject Pageable pageable) {
+        return productService.getOwnerProducts(ownerId, pageable);
     }
 
     @SecurityRequirement(name = "bearerAuth")

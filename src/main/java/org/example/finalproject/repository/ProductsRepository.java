@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ProductsRepository extends JpaRepository<Products, Long>, JpaSpecificationExecutor<Products> {
 
-    Page<Products> findByVendorId(Long vendorId, Pageable pageable);
+    Page<Products> findByOwnerId(Long ownerId, Pageable pageable);
     Page<Products> findByCategoryId(Long categoryId, Pageable pageable);
 
 }

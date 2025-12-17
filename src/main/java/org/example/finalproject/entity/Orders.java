@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.finalproject.enums.OrderStatus;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,10 +23,21 @@ public class Orders {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Products product;
+
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Users customer;
 
-    @Column(name = "order_date")
+    @Column(name = "day")
+    private Integer day;
+
+    @Column(name = "total_amount")
+    private Double total_amount;
+
+    @CreationTimestamp
+    @Column(name = "order_date", updatable = false)
     private LocalDateTime orderDate = LocalDateTime.now();
 
     @Column(length = 20)

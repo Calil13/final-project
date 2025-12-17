@@ -22,6 +22,7 @@ public interface UsersMapper {
                 .surname(user.getSurname())
                 .email(user.getEmail())
                 .phone(user.getPhone())
+                .address(user.getAddress())
                 .userRole(user.getUserRole().name())
                 .createdAt(user.getCreatedAt())
                 .isActive(user.getIsActive())

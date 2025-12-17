@@ -18,4 +18,5 @@ public class ProductResponseDto {
     private String description;
     private Double price;
     private String address;
+    private Boolean isAvailable;
 }

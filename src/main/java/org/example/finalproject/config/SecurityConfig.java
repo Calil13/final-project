@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/productImage/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_OWNER")
                         .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_OWNER")
+                        .requestMatchers("/orders/**").hasAuthority("ROLE_CUSTOMER")
                         .requestMatchers("/user/**").authenticated()
                         .anyRequest().authenticated()
                 )

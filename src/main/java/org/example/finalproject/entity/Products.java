@@ -37,6 +37,9 @@ public class Products {
     @Column(nullable = false)
     private Double price;
 
+    @Column(name = "is_available", nullable = false)
+    private Boolean isAvailable = true;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

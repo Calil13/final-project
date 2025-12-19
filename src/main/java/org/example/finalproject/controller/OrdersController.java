@@ -1,5 +1,6 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,5 +28,14 @@ public class OrdersController {
     @PostMapping
     public String createOrder(@Valid @RequestBody OrdersDto ordersDto) {
         return ordersService.createOrder(ordersDto);
+    }
+
+    @Operation(
+            summary = "Confirm order received"
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping("/delivered")
+    public void received() {
+        ordersService.received();
     }
 }

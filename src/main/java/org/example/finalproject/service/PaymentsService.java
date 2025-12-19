@@ -62,8 +62,9 @@ public class PaymentsService {
         String validationError = validateCard(cardNumber, cvv, expireDate);
 
         if (validationError != null) {
+            log.error("Payment FAILED! \n{}", validationError);
             return new PaymentResponseDto(
-                    "Payment FAILED! \n" + validationError
+                    "Payment FAILED! " + validationError
             );
         }
 
@@ -128,7 +129,7 @@ public class PaymentsService {
 
         paymentRepository.save(payment);
 
-        order.setDeliveryType(DeliveryType.PICKUP);
+        order.setDeliveryType(DeliveryType.DELIVERY);
         ordersRepository.save(order);
 
         usersRepository.save(customer);

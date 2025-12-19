@@ -9,7 +9,6 @@ import org.example.finalproject.enums.UserRole;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -37,9 +36,6 @@ public class Users {
 
     @Column(name = "phone")
     private String phone;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addresses;
 
     @Column(name = "user_role", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

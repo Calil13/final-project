@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.enums.OrderStatus;
+import org.example.finalproject.enums.PaymentMethod;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,7 +37,11 @@ public class Orders {
     private Integer day;
 
     @Column(name = "total_amount")
-    private Double total_amount;
+    private BigDecimal totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_type")
+    private DeliveryType deliveryType;
 
     @CreationTimestamp
     @Column(name = "order_date", updatable = false)

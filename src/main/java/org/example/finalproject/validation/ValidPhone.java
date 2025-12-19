@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ValidPhoneValidator.class)
 public @interface ValidPhone {
 
-    String message() default "The phone number is not in the correct format!";
+    String message() default "The newPhone number is not in the correct format!";
 
     Class<?>[] groups() default {};
 

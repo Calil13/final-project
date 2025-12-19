@@ -81,9 +81,17 @@ public class ProductsService {
     }
 
     public ProductRequestDto editProduct(ProductRequestDto requestDto) {
-        var product = productRepository.findById(requestDto.getProductId())
+
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var product = productRepository.findByOwner(user)
                 .orElseThrow(() -> {
-                    log.error("Product not found: {}", requestDto.getProductId());
+                    log.error("Product not found!");
                     return new NotFoundException("Product not found!");
                 });
 

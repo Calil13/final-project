@@ -151,7 +151,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.FORBIDDEN.value());
-        body.put("error", "Access Denied");
+        body.put("error", "Access Denied.");
         body.put("message", e.getMessage());
 
         return new ExceptionDto(body);
@@ -164,7 +164,20 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad request");
+        body.put("error", "Bad request.");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(ProductNotAvailableException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto handleProductNotAvailable(ProductNotAvailableException e) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Product is not available for ordering.");
         body.put("message", e.getMessage());
 
         return new ExceptionDto(body);

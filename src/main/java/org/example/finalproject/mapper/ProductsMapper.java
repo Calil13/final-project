@@ -11,15 +11,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ProductsMapper {
 
-    default ProductResponseDto toDto(Products product) {
-        return ProductResponseDto.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .address(product.getOwner().getAddress())
-                .build();
-    }
+    ProductResponseDto toDto(Products product);
 
     ProductRequestDto toDtoRequest(Products products);
 

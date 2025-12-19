@@ -6,14 +6,13 @@ import org.example.finalproject.dto.AddressDto;
 import org.example.finalproject.dto.DeliveryInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.entity.Orders;
+import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.enums.OrderStatus;
+import org.example.finalproject.enums.PaymentStatus;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.ProductNotAvailableException;
 import org.example.finalproject.mapper.AddressMapper;
-import org.example.finalproject.repository.AddressRepository;
-import org.example.finalproject.repository.OrdersRepository;
-import org.example.finalproject.repository.ProductsRepository;
-import org.example.finalproject.repository.UsersRepository;
+import org.example.finalproject.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +29,7 @@ public class OrdersService {
     private final ProductsRepository productsRepository;
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
+    private final PaymentRepository paymentRepository;
 
     public DeliveryInfoResponseDto getDeliveryInfo() {
         String currentEmail = SecurityContextHolder.getContext()
@@ -58,7 +58,7 @@ public class OrdersService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var product = productsRepository.findById(ordersDto.getProductId())
-                .orElseThrow(() -> new NotFoundException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
 
         if (product.getIsAvailable().equals(false)) {
             log.error("Product is not available for ordering.");
@@ -82,5 +82,27 @@ public class OrdersService {
         ordersRepository.save(order);
 
         return "Your total amount : " + totalAmount + " AZN";
+    }
+
+    public void received() {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var payment = paymentRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        var order = ordersRepository.findByCustomer(user)
+                .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        if (order.getDeliveryType().equals(DeliveryType.PICKUP)) {
+            payment.setPaymentStatus(PaymentStatus.SUCCESS);
+        }
+
+        order.setOrderStatus(OrderStatus.DELIVERED);
+        ordersRepository.save(order);
     }
 }

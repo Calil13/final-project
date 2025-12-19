@@ -3,12 +3,15 @@ package org.example.finalproject.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.*;
+import org.example.finalproject.entity.Address;
 import org.example.finalproject.entity.RefreshToken;
 import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.*;
 import org.example.finalproject.jwt.JwtUtil;
+import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.mapper.UsersMapper;
+import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.RefreshTokenRepository;
 import org.example.finalproject.repository.UsersRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +30,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
+    private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
     public String startRegistration(EmailSentOtpDto start) {
 
@@ -52,7 +57,12 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(finish.getPassword()));
         user.setUserRole(UserRole.CUSTOMER);
         user.setPhone("+994" + finish.getPhone());
+
+        Address address = addressMapper.toEntity(finish.getAddress());
+        address.setUser(user);
+
         usersRepository.save(user);
+        addressRepository.save(address);
 
         otpService.removeOtp(finish.getEmail());
 

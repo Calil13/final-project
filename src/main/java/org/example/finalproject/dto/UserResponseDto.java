@@ -18,7 +18,6 @@ public class UserResponseDto {
     private String surname;
     private String email;
     private String phone;
-    private AddressDto address;
     private String userRole;
     private LocalDateTime createdAt;
     private boolean isActive;

@@ -2,17 +2,22 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.finalproject.dto.AddressDto;
+import org.example.finalproject.dto.DeliveryInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.entity.Orders;
 import org.example.finalproject.enums.OrderStatus;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.mapper.OrdersMapper;
+import org.example.finalproject.exception.ProductNotAvailableException;
+import org.example.finalproject.mapper.AddressMapper;
+import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.OrdersRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -23,7 +28,26 @@ public class OrdersService {
     private final OrdersRepository ordersRepository;
     private final UsersRepository usersRepository;
     private final ProductsRepository productsRepository;
-    private final OrdersMapper ordersMapper;
+    private final AddressMapper addressMapper;
+    private final AddressRepository addressRepository;
+
+    public DeliveryInfoResponseDto getDeliveryInfo() {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var address = addressRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Address not found!"));
+
+        addressMapper.toDto(address);
+
+        AddressDto addressDto = addressMapper.toDto(address);
+
+        return new DeliveryInfoResponseDto(user.getPhone(), addressDto);
+    }
 
     public String createOrder(OrdersDto ordersDto) {
         String currentEmail = SecurityContextHolder.getContext()
@@ -36,13 +60,19 @@ public class OrdersService {
         var product = productsRepository.findById(ordersDto.getProductId())
                 .orElseThrow(() -> new NotFoundException("Product not found"));
 
-        Double totalAmount = product.getPrice() * ordersDto.getDay();
+        if (product.getIsAvailable().equals(false)) {
+            log.error("Product is not available for ordering.");
+            throw new ProductNotAvailableException("The product is already rented!");
+        }
+
+        BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(ordersDto.getDay()));
+
 
         Orders order = Orders.builder()
                 .customer(user)
                 .product(product)
                 .day(ordersDto.getDay())
-                .total_amount(totalAmount)
+                .totalAmount(totalAmount)
                 .orderStatus(OrderStatus.PENDING)
                 .build();
 

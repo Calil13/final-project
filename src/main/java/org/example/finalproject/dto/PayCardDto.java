@@ -5,8 +5,8 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class OwnerRequestDto {
-    private Long userId;
+public class PayCardDto {
+    private Long orderId;
     private String cardNumber;
     private String cvv;
     private String expireDate;

@@ -19,9 +19,8 @@ public class UsersController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
-    public UserResponseDto getUserInfo(Authentication authentication) {
-        String email = authentication.getName();
-        return usersService.getUserInfo(email);
+    public UserResponseDto getUserInfo() {
+        return usersService.getUserInfo();
     }
 
     @SecurityRequirement(name = "bearerAuth")
@@ -32,7 +31,7 @@ public class UsersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/newPhone")
+    @PatchMapping("/updatePhone")
     public String updatePhone(@Valid @RequestBody UsersUpdatePhoneDto updatePhone) {
         return usersService.updatePhone(updatePhone);
     }
@@ -63,7 +62,7 @@ public class UsersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("/become")
+    @PostMapping("/becomeOwner")
     public String becomeOwner(@RequestBody OwnerRequestDto ownerRequestDTO) {
         return usersService.becomeOwner(ownerRequestDTO);
     }

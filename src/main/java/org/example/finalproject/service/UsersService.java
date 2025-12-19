@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.*;
 import org.example.finalproject.entity.Payment;
-import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.PaymentMethod;
 import org.example.finalproject.enums.PaymentPurpose;
 import org.example.finalproject.enums.PaymentStatus;
@@ -14,6 +13,7 @@ import org.example.finalproject.exception.BadRequestException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.WrongPasswordException;
 import org.example.finalproject.mapper.UsersMapper;
+import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.OtpRepository;
 import org.example.finalproject.repository.PaymentRepository;
 import org.example.finalproject.repository.UsersRepository;
@@ -31,16 +31,18 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final UsersMapper usersMapper;
     private final OtpService otpService;
-    private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
     private final PaymentRepository paymentRepository;
+    private final PaymentsService paymentsService;
+    private final AddressRepository addressRepository;
 
-    public UserResponseDto getUserInfo(String email) {
-        var user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("User not found!");
-                    return new NotFoundException("User not found!");
-                });
+    public UserResponseDto getUserInfo() {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
 
         return usersMapper.toResponseDto(user);
     }
@@ -65,7 +67,7 @@ public class UsersService {
         var user = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        user.setPhone("+994" + updatePhone.getPhone());
+        user.setPhone("+994" + updatePhone.getNewPhone());
         usersRepository.save(user);
 
         return "Phone updated successfully!";
@@ -174,7 +176,7 @@ public class UsersService {
         String cvv = dto.getCvv();
         String expireDate = dto.getExpireDate();
 
-        String validationError = validateCard(cardNumber, cvv, expireDate);
+        String validationError = paymentsService.validateCard(cardNumber, cvv, expireDate);
 
         if (validationError != null) {
             return "Payment FAILED! \n" + validationError;
@@ -207,20 +209,20 @@ public class UsersService {
 
     }
 
-    private String validateCard(String cardNumber, String cvv, String expireDate) {
-
-        if (cardNumber == null || !cardNumber.matches("\\d{16}")) {
-            return "Card number must be exactly 16 digits.";
-        }
-
-        if (cvv == null || !cvv.matches("\\d{3}")) {
-            return "CVV must be exactly 3 digits.";
-        }
-
-        if (expireDate == null || !expireDate.matches("^(0[1-9]|1[0-2])/\\d{2}$")) {
-            return "Expire date must be in MM/YY format.";
-        }
-
-        return null;
-    }
+//    private String validateCard(String cardNumber, String cvv, String expireDate) {
+//
+//        if (cardNumber == null || !cardNumber.matches("\\d{16}")) {
+//            return "Card number must be exactly 16 digits.";
+//        }
+//
+//        if (cvv == null || !cvv.matches("\\d{3}")) {
+//            return "CVV must be exactly 3 digits.";
+//        }
+//
+//        if (expireDate == null || !expireDate.matches("^(0[1-9]|1[0-2])/\\d{2}$")) {
+//            return "Expire date must be in MM/YY format.";
+//        }
+//
+//        return null;
+//    }
 }

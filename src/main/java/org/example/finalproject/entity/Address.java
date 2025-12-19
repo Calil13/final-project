@@ -25,7 +25,7 @@ public class Address {
     @Column(nullable = false, length = 50)
     private String home;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private Users user;
 }

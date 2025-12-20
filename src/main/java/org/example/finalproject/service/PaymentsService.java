@@ -49,10 +49,10 @@ public class PaymentsService {
                     return new NotFoundException("Customer not found!");
                 });
 
-        var order = ordersRepository.findByCustomer(customer)
+        var order = ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED)
                 .orElseThrow(() -> {
-                    log.error("Order not found!");
-                    return new NotFoundException("Order not found!");
+                    log.error("Active order not found!");
+                    return new NotFoundException("Active order not found!");
                 });
 
         String cardNumber = cardDto.getCardNumber();
@@ -111,10 +111,10 @@ public class PaymentsService {
                     return new NotFoundException("Customer not found!");
                 });
 
-        var order = ordersRepository.findByCustomer(customer)
+        var order = ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED)
                 .orElseThrow(() -> {
-                    log.error("Order not found.");
-                    return new NotFoundException("Order not found!");
+                    log.error("Active order not found.");
+                    return new NotFoundException("Active order not found!");
                 });
 
         Payment payment = Payment.builder()
@@ -129,6 +129,7 @@ public class PaymentsService {
 
         paymentRepository.save(payment);
 
+        order.setOrderStatus(OrderStatus.PENDING);
         order.setDeliveryType(DeliveryType.DELIVERY);
         ordersRepository.save(order);
 

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.DeliveryInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.service.OrdersService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,5 +38,11 @@ public class OrdersController {
     @PatchMapping("/delivered")
     public void received() {
         ordersService.received();
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping("return")
+    public ResponseEntity<String> returnRental() {
+        return ordersService.returnRental();
     }
 }

@@ -43,11 +43,11 @@ public class Orders {
     @Column(name = "delivery_type")
     private DeliveryType deliveryType;
 
-    @CreationTimestamp
-    @Column(name = "order_date", updatable = false)
-    private LocalDateTime orderDate = LocalDateTime.now();
-
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
+    @CreationTimestamp
+    @Column(name = "order_date", updatable = false)
+    private LocalDateTime orderDate = LocalDateTime.now();
 }

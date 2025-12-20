@@ -13,6 +13,7 @@ import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.ProductNotAvailableException;
 import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.repository.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +74,7 @@ public class OrdersService {
                 .product(product)
                 .day(ordersDto.getDay())
                 .totalAmount(totalAmount)
-                .orderStatus(OrderStatus.PENDING)
+                .orderStatus(OrderStatus.CREATED)
                 .build();
 
         product.setIsAvailable(false);
@@ -104,5 +105,27 @@ public class OrdersService {
 
         order.setOrderStatus(OrderStatus.DELIVERED);
         ordersRepository.save(order);
+    }
+
+    public ResponseEntity<String> returnRental() {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var order = ordersRepository.findByCustomer(user)
+                .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        if (LocalDateTime.now().isBefore(order.getOrderDate())) {
+            return ResponseEntity.badRequest()
+                    .body("The product has not expired yet.");
+        }
+
+        order.setOrderStatus(OrderStatus.RETURNED);
+        ordersRepository.save(order);
+
+        return ResponseEntity.ok("The product has been returned.");
     }
 }

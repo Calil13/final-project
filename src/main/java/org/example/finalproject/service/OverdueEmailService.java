@@ -41,7 +41,7 @@ public class OverdueEmailService {
 
                 Users user = order.getCustomer();
 
-                String subject = "Kirayə müddəti başa çatmışdır";
+                String subject = "Kirayə müddəti başa çatmışdır!";
 
                 String body =
                         "Hörmətli " + user.getName() + ",\n\n" +

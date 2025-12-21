@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.PayCardDto;
 import org.example.finalproject.dto.PaymentResponseDto;
+import org.example.finalproject.entity.Address;
 import org.example.finalproject.entity.Payment;
+import org.example.finalproject.entity.Products;
+import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.*;
 import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.IllegalArgumentException;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.repository.OrdersRepository;
-import org.example.finalproject.repository.PaymentRepository;
-import org.example.finalproject.repository.UsersRepository;
+import org.example.finalproject.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class PaymentsService {
     private final UsersRepository usersRepository;
     private final OrdersRepository ordersRepository;
     private final PaymentRepository paymentRepository;
+    private final AddressRepository addressRepository;
 
     public PaymentResponseDto pay(PaymentMethod paymentMethod, PayCardDto cardDto) {
         return
@@ -92,10 +94,27 @@ public class PaymentsService {
         paymentRepository.save(payment);
 
         order.setOrderStatus(OrderStatus.PAID);
-        order.setDeliveryType(DeliveryType.DELIVERY);
         ordersRepository.save(order);
 
         usersRepository.save(customer);
+
+        if (order.getDeliveryType() == DeliveryType.PICKUP) {
+
+            Products product = order.getProduct();
+            Users owner = product.getOwner();
+
+            Address address = addressRepository.findByUser(owner)
+                    .orElseThrow(() -> {
+                log.error("Pickup address not found for owner {}", owner.getEmail());
+                return new NotFoundException("Pickup address not found");
+            });
+
+            String pickupAddress = address.getCity() + ", \n"
+                    + address.getStreet() + ", \n"
+                    + address.getHome();
+
+            return new PaymentResponseDto("Payment completed successfully. \n" + "Owner address \n :" + pickupAddress);
+        }
 
         return new PaymentResponseDto("Payment completed successfully.");
     }

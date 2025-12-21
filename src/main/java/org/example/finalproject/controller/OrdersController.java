@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.DeliveryInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
+import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.service.OrdersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,9 @@ public class OrdersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping
-    public String createOrder(@Valid @RequestBody OrdersDto ordersDto) {
-        return ordersService.createOrder(ordersDto);
+    @PostMapping("{deliveryType}")
+    public String createOrder(@Valid @PathVariable DeliveryType deliveryType, @RequestBody OrdersDto ordersDto) {
+        return ordersService.createOrder(deliveryType, ordersDto);
     }
 
     @Operation(

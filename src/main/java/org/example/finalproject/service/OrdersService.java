@@ -50,7 +50,7 @@ public class OrdersService {
         return new DeliveryInfoResponseDto(user.getPhone(), addressDto);
     }
 
-    public String createOrder(OrdersDto ordersDto) {
+    public String createOrder(DeliveryType deliveryType, OrdersDto ordersDto) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -75,6 +75,7 @@ public class OrdersService {
                 .day(ordersDto.getDay())
                 .totalAmount(totalAmount)
                 .orderStatus(OrderStatus.CREATED)
+                .deliveryType(deliveryType)
                 .build();
 
         product.setIsAvailable(false);
@@ -94,7 +95,7 @@ public class OrdersService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var payment = paymentRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Order not found!"));
+                .orElseThrow(() -> new NotFoundException("Payment not found!"));
 
         var order = ordersRepository.findByCustomer(user)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));

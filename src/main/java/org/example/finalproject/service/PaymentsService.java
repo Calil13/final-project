@@ -41,15 +41,15 @@ public class PaymentsService {
                 .getAuthentication()
                 .getName();
 
-        if (cardDto == null) {
-            throw new IllegalArgumentException("Card payment requires card data");
-        }
-
         var customer = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> {
                     log.error("Customer not found!");
                     return new NotFoundException("Customer not found!");
                 });
+
+        if (cardDto == null) {
+            throw new IllegalArgumentException("Card payment requires card data!");
+        }
 
         var order = ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED)
                 .orElseThrow(() -> {
@@ -100,8 +100,8 @@ public class PaymentsService {
 
         if (order.getDeliveryType() == DeliveryType.PICKUP) {
 
-            Products product = order.getProduct();
-            Users owner = product.getOwner();
+            var product = order.getProduct();
+            var owner = product.getOwner();
 
             Address address = addressRepository.findByUser(owner)
                     .orElseThrow(() -> {
@@ -153,6 +153,24 @@ public class PaymentsService {
         ordersRepository.save(order);
 
         usersRepository.save(customer);
+
+        if (order.getDeliveryType() == DeliveryType.PICKUP) {
+
+            var product = order.getProduct();
+            var owner = product.getOwner();
+
+            Address address = addressRepository.findByUser(owner)
+                    .orElseThrow(() -> {
+                        log.error("Pickup address not found for owner {}.", owner.getEmail());
+                        return new NotFoundException("Pickup address not found");
+                    });
+
+            String pickupAddress = address.getCity() + ", \n"
+                    + address.getStreet() + ", \n"
+                    + address.getHome();
+
+            return new PaymentResponseDto("Cash payment will be collected on delivery. \n" + "Owner address \n :" + pickupAddress);
+        }
 
         return new PaymentResponseDto(
                 "Cash payment will be collected on delivery."

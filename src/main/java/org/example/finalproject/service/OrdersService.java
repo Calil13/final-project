@@ -8,6 +8,7 @@ import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.entity.Orders;
 import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.enums.OrderStatus;
+import org.example.finalproject.enums.PaymentMethod;
 import org.example.finalproject.enums.PaymentStatus;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.ProductNotAvailableException;
@@ -100,7 +101,7 @@ public class OrdersService {
         var order = ordersRepository.findByCustomer(user)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));
 
-        if (order.getDeliveryType().equals(DeliveryType.PICKUP)) {
+        if (payment.getPaymentMethod().equals(PaymentMethod.CASH)) {
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
         }
 

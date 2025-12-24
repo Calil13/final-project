@@ -46,4 +46,10 @@ public class OrdersController {
     public ResponseEntity<String> returnRental() {
         return ordersService.returnRental();
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/id")
+    public String deleteOrder(@PathVariable Long id) {
+        return null;
+    }
 }

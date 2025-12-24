@@ -130,4 +130,20 @@ public class OrdersService {
 
         return ResponseEntity.ok("The product has been returned.");
     }
+
+    public String deleteOrder(Long id) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("Customer not found!"));
+
+        var order = ordersRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        ordersRepository.delete(order);
+
+        return "The order has been cancelled and your payment has been refunded.";
+    }
 }

@@ -3,13 +3,17 @@ package org.example.finalproject.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.AddressDto;
-import org.example.finalproject.dto.DeliveryInfoResponseDto;
+import org.example.finalproject.dto.OrderInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.entity.Orders;
+import org.example.finalproject.entity.Products;
+import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.enums.OrderStatus;
 import org.example.finalproject.enums.PaymentMethod;
 import org.example.finalproject.enums.PaymentStatus;
+import org.example.finalproject.exception.AccessDeniedException;
+import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.ProductNotAvailableException;
 import org.example.finalproject.mapper.AddressMapper;
@@ -33,7 +37,7 @@ public class OrdersService {
     private final AddressRepository addressRepository;
     private final PaymentRepository paymentRepository;
 
-    public DeliveryInfoResponseDto getDeliveryInfo() {
+    public OrderInfoResponseDto getDeliveryInfo() {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -44,12 +48,35 @@ public class OrdersService {
         var address = addressRepository.findByUser(user)
                 .orElseThrow(() -> new NotFoundException("Address not found!"));
 
-        addressMapper.toDto(address);
-
         AddressDto addressDto = addressMapper.toDto(address);
 
-        return new DeliveryInfoResponseDto(user.getPhone(), addressDto);
+        return new OrderInfoResponseDto(user.getPhone(), addressDto);
     }
+
+//    public OrderInfoResponseDto getPickUpInfo(Long orderId) {
+//        String currentEmail = SecurityContextHolder.getContext()
+//                .getAuthentication()
+//                .getName();
+//
+//        var customer = usersRepository.findByEmail(currentEmail)
+//                .orElseThrow(() -> new NotFoundException("User not found!"));
+//
+//        var order = ordersRepository.findById(orderId)
+//                .orElseThrow(() -> new NotFoundException("Order not found!"));
+//
+//        if (!order.getCustomer().getId().equals(customer.getId())) {
+//            throw new AccessDeniedException("You cannot access this order.");
+//        }
+//
+//        Products product = order.getProduct();
+//
+//        var address = addressRepository.findByUser(product.getOwner())
+//                .orElseThrow(() -> new NotFoundException("Address not found!"));
+//
+//        AddressDto addressDto = addressMapper.toDto(address);
+//
+//        return new  OrderInfoResponseDto(product.getOwner().getPhone(), addressDto);
+//    }
 
     public String createOrder(DeliveryType deliveryType, OrdersDto ordersDto) {
         String currentEmail = SecurityContextHolder.getContext()
@@ -69,7 +96,6 @@ public class OrdersService {
 
         BigDecimal totalAmount = product.getPrice().multiply(BigDecimal.valueOf(ordersDto.getDay()));
 
-
         Orders order = Orders.builder()
                 .customer(user)
                 .product(product)
@@ -87,22 +113,26 @@ public class OrdersService {
         return "Your total amount : " + totalAmount + " AZN";
     }
 
-    public void received() {
+    public void received(Long id) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var payment = paymentRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Payment not found!"));
-
-        var order = ordersRepository.findByCustomer(user)
+        var order = ordersRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        var payment = paymentRepository.findByOrder(order)
+                .orElseThrow(() -> new NotFoundException("Payment not found!"));
 
         if (payment.getPaymentMethod().equals(PaymentMethod.CASH)) {
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
+        }
+
+        if (order.getOrderStatus().equals(OrderStatus.DELIVERED)) {
+            throw new AlreadyExistsException("The order has already been delivered!");
         }
 
         order.setOrderStatus(OrderStatus.DELIVERED);
@@ -131,7 +161,7 @@ public class OrdersService {
         return ResponseEntity.ok("The product has been returned.");
     }
 
-    public String deleteOrder(Long id) {
+    public String deleteOrder(Long productId) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -139,11 +169,17 @@ public class OrdersService {
         usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
-        var order = ordersRepository.findById(id)
+        var product = productsRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
+
+        var order = ordersRepository.findByProduct(product)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));
 
+        product.setIsAvailable(true);
+
+        productsRepository.save(product);
         ordersRepository.delete(order);
 
-        return "The order has been cancelled and your payment has been refunded.";
+        return "The order has been cancelled.";
     }
 }

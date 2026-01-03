@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.example.finalproject.dto.DeliveryInfoResponseDto;
+import org.example.finalproject.dto.OrderInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
 import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.service.OrdersService;
@@ -22,9 +22,15 @@ public class OrdersController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/delivery-info")
-    public DeliveryInfoResponseDto getDeliveryInfo() {
+    public OrderInfoResponseDto getDeliveryInfo() {
         return ordersService.getDeliveryInfo();
     }
+
+//    @SecurityRequirement(name = "bearerAuth")
+//    @GetMapping("/pickUp-info/{orderId}")
+//    public OrderInfoResponseDto getPickUpInfo(@PathVariable Long orderId) {
+//        return ordersService.getPickUpInfo(orderId);
+//    }
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("{deliveryType}")
@@ -36,9 +42,9 @@ public class OrdersController {
             summary = "Confirm order received"
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/delivered")
-    public void received() {
-        ordersService.received();
+    @PatchMapping("/delivered/{id}")
+    public void received(@PathVariable Long id) {
+        ordersService.received(id);
     }
 
     @SecurityRequirement(name = "bearerAuth")
@@ -48,8 +54,8 @@ public class OrdersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @DeleteMapping("/id")
-    public String deleteOrder(@PathVariable Long id) {
-        return null;
+    @DeleteMapping("/{productId}")
+    public String deleteOrder(@PathVariable Long productId) {
+        return ordersService.deleteOrder(productId);
     }
 }

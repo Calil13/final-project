@@ -1,5 +1,7 @@
 package org.example.finalproject.repository;
 
+import org.example.finalproject.entity.Orders;
+import org.example.finalproject.entity.Payment;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.entity.Users;
 import org.springframework.data.domain.Page;

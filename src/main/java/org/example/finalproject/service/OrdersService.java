@@ -53,31 +53,6 @@ public class OrdersService {
         return new OrderInfoResponseDto(user.getPhone(), addressDto);
     }
 
-//    public OrderInfoResponseDto getPickUpInfo(Long orderId) {
-//        String currentEmail = SecurityContextHolder.getContext()
-//                .getAuthentication()
-//                .getName();
-//
-//        var customer = usersRepository.findByEmail(currentEmail)
-//                .orElseThrow(() -> new NotFoundException("User not found!"));
-//
-//        var order = ordersRepository.findById(orderId)
-//                .orElseThrow(() -> new NotFoundException("Order not found!"));
-//
-//        if (!order.getCustomer().getId().equals(customer.getId())) {
-//            throw new AccessDeniedException("You cannot access this order.");
-//        }
-//
-//        Products product = order.getProduct();
-//
-//        var address = addressRepository.findByUser(product.getOwner())
-//                .orElseThrow(() -> new NotFoundException("Address not found!"));
-//
-//        AddressDto addressDto = addressMapper.toDto(address);
-//
-//        return new  OrderInfoResponseDto(product.getOwner().getPhone(), addressDto);
-//    }
-
     public String createOrder(DeliveryType deliveryType, OrdersDto ordersDto) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
@@ -113,7 +88,7 @@ public class OrdersService {
         return "Your total amount : " + totalAmount + " AZN";
     }
 
-    public void received(Long id) {
+    public void received(Long orderId) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -121,7 +96,7 @@ public class OrdersService {
         usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var order = ordersRepository.findById(id)
+        var order = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));
 
         var payment = paymentRepository.findByOrder(order)
@@ -139,21 +114,26 @@ public class OrdersService {
         ordersRepository.save(order);
     }
 
-    public ResponseEntity<String> returnRental() {
+    public ResponseEntity<String> returnRental(Long orderId) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var order = ordersRepository.findByCustomer(user)
+        var order = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found!"));
+
+        var product = order.getProduct();
 
         if (LocalDateTime.now().isBefore(order.getOrderDate())) {
             return ResponseEntity.badRequest()
                     .body("The product has not expired yet.");
         }
+
+        product.setIsAvailable(true);
+        productsRepository.save(product);
 
         order.setOrderStatus(OrderStatus.RETURNED);
         ordersRepository.save(order);

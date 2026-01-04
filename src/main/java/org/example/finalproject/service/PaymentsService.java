@@ -113,7 +113,7 @@ public class PaymentsService {
                     + address.getStreet() + ", \n"
                     + address.getHome();
 
-            return new PaymentResponseDto("Payment completed successfully. \n" + "Owner address \n :" + pickupAddress);
+            return new PaymentResponseDto("Payment completed successfully." + " - Owner address :" + pickupAddress);
         }
 
         return new PaymentResponseDto("Payment completed successfully.");
@@ -149,7 +149,6 @@ public class PaymentsService {
         paymentRepository.save(payment);
 
         order.setOrderStatus(OrderStatus.PENDING);
-        order.setDeliveryType(DeliveryType.DELIVERY);
         ordersRepository.save(order);
 
         usersRepository.save(customer);
@@ -169,7 +168,7 @@ public class PaymentsService {
                     + address.getStreet() + ", \n"
                     + address.getHome();
 
-            return new PaymentResponseDto("Cash payment will be collected on delivery. \n" + "Owner address \n :" + pickupAddress);
+            return new PaymentResponseDto("Cash payment will be collected on delivery." + " - Owner address :" + pickupAddress);
         }
 
         return new PaymentResponseDto(

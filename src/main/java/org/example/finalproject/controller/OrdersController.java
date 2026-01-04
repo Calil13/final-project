@@ -42,15 +42,15 @@ public class OrdersController {
             summary = "Confirm order received"
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/delivered/{id}")
-    public void received(@PathVariable Long id) {
-        ordersService.received(id);
+    @PatchMapping("/delivered/{orderId}")
+    public void received(@PathVariable Long orderId) {
+        ordersService.received(orderId);
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("return")
-    public ResponseEntity<String> returnRental() {
-        return ordersService.returnRental();
+    @PatchMapping("return/{orderId}")
+    public ResponseEntity<String> returnRental(@PathVariable Long orderId) {
+        return ordersService.returnRental(orderId);
     }
 
     @SecurityRequirement(name = "bearerAuth")

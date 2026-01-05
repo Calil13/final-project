@@ -26,12 +26,6 @@ public class OrdersController {
         return ordersService.getDeliveryInfo();
     }
 
-//    @SecurityRequirement(name = "bearerAuth")
-//    @GetMapping("/pickUp-info/{orderId}")
-//    public OrderInfoResponseDto getPickUpInfo(@PathVariable Long orderId) {
-//        return ordersService.getPickUpInfo(orderId);
-//    }
-
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("{deliveryType}")
     public String createOrder(@Valid @PathVariable DeliveryType deliveryType, @RequestBody OrdersDto ordersDto) {

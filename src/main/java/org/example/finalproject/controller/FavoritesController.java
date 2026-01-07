@@ -8,9 +8,7 @@ import org.example.finalproject.service.FavoriteService;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -23,6 +21,18 @@ public class FavoritesController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public Page<FavoriteProductsDto> getFavorites(@ParameterObject Pageable pageable) {
-        return null;
+        return favoriteService.getFavorites(pageable);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/{productId}")
+    public void addFavorite(@PathVariable Long productId) {
+        favoriteService.addFavorite(productId);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("{favoriteId}")
+    public void deleteFavorite(@PathVariable Long favoriteId) {
+        favoriteService.deleteFavorite(favoriteId);
     }
 }

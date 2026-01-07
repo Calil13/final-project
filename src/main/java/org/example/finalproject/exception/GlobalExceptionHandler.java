@@ -53,6 +53,19 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(body);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto handleIllegalState(IllegalStateException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Invalid Resource State");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+
     @ExceptionHandler(NotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleValidException(NotValidException e) {
@@ -191,7 +204,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", 403);
         body.put("error", "Access Denied");
-        body.put("message", "Your role does not allow you to rent this operation.");
+        body.put("message", "Your role does not allow you to perform this operation.");
 
         new ObjectMapper().writeValue(response.getOutputStream(), body);
     }

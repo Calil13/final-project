@@ -11,5 +11,5 @@ import org.example.finalproject.entity.Products;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavoriteProductsDto {
-    private Products products;
+    private ProductResponseDto product;
 }

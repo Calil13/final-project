@@ -27,7 +27,7 @@ public class Favorites {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private Products products;
+    private Products product;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

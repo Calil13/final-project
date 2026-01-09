@@ -58,7 +58,7 @@ public class FavoriteService {
             throw new AlreadyExistsException("Product already added to favorites.");
         }
 
-        if (product.getIsAvailable().equals(false)){
+        if (product.getIsAvailable().equals(false)) {
             log.error("Inactive product cannot be added to favorites.");
             throw new IllegalStateException("Inactive product cannot be added to favorites.");
         }

@@ -28,9 +28,6 @@ public class ProductReview {
     @JoinColumn(name = "customer_id", nullable = false)
     private Users customer;
 
-    @Column(nullable = false)
-    private Integer rating;
-
     @Column(columnDefinition = "TEXT")
     private String comment;
 

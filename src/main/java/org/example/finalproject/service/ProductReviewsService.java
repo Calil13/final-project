@@ -2,10 +2,16 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.finalproject.dto.ProductReviewsResponseDto;
+import org.example.finalproject.entity.ProductReview;
 import org.example.finalproject.exception.IllegalStateException;
 import org.example.finalproject.exception.NotFoundException;
+import org.example.finalproject.mapper.ProductReviewsMapper;
+import org.example.finalproject.repository.ProductReviewRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +23,10 @@ public class ProductReviewsService {
 
     private final UsersRepository usersRepository;
     private final ProductsRepository productsRepository;
+    private final ProductReviewRepository productReviewRepository;
+    private final ProductReviewsMapper productReviewsMapper;
 
-    public void addReviews(Long productId) {
+    public void addReviews(Long productId, String comment) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -34,6 +42,22 @@ public class ProductReviewsService {
             throw new IllegalStateException("A review cannot be added to an inactive product.");
         }
 
+        ProductReview review = ProductReview.builder()
+                .comment(comment)
+                .product(product)
+                .customer(customer)
+                .build();
 
+        productReviewRepository.save(review);
+    }
+
+    public Page<ProductReviewsResponseDto> getReviews(Pageable pageable, Long productId) {
+
+        var product = productsRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
+
+        Page<ProductReview> reviews = productReviewRepository.findReviewsByProduct(product, pageable);
+
+        return reviews.map(productReviewsMapper::toDto);
     }
 }

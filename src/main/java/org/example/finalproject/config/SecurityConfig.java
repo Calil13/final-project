@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_OWNER")
                         .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_OWNER")
+                        .requestMatchers(HttpMethod.POST, "/productReviews/**").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/productReviews/**").permitAll()
                         .requestMatchers("/payments/pay/").hasAuthority("ROLE_CUSTOMER")
                         .requestMatchers("/orders/**").hasAuthority("ROLE_CUSTOMER")
                         .requestMatchers("/address/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")

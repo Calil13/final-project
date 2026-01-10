@@ -22,7 +22,7 @@ public class ProductReview {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    private Products products;
+    private Products product;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)

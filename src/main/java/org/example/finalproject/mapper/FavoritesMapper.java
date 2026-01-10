@@ -6,6 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface FavoritesMapper {
-
     FavoriteProductsDto toDto(Favorites favorites);
 }

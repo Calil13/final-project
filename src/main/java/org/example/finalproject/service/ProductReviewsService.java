@@ -26,6 +26,16 @@ public class ProductReviewsService {
     private final ProductReviewRepository productReviewRepository;
     private final ProductReviewsMapper productReviewsMapper;
 
+    public Page<ProductReviewsResponseDto> getReviews(Pageable pageable, Long productId) {
+
+        var product = productsRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
+
+        Page<ProductReview> reviews = productReviewRepository.findReviewsByProduct(product, pageable);
+
+        return reviews.map(productReviewsMapper::toDto);
+    }
+
     public void addReviews(Long productId, String comment) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
@@ -51,13 +61,40 @@ public class ProductReviewsService {
         productReviewRepository.save(review);
     }
 
-    public Page<ProductReviewsResponseDto> getReviews(Pageable pageable, Long productId) {
+    public void editReviews(Long reviewId, String editedComment) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
 
-        var product = productsRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found!"));
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
-        Page<ProductReview> reviews = productReviewRepository.findReviewsByProduct(product, pageable);
+        var review = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> {
+                    log.error("Review not found.");
+                    return new NotFoundException("Review not found!");
+                });
 
-        return reviews.map(productReviewsMapper::toDto);
+        review.setComment(editedComment);
+        productReviewRepository.save(review);
+    }
+
+    public String deleteReview(Long reviewId) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("Customer not found!"));
+
+        var review = productReviewRepository.findById(reviewId)
+                .orElseThrow(() -> {
+                    log.error("Review not found!");
+                    return new NotFoundException("Review not found!");
+                });
+
+        productReviewRepository.delete(review);
+
+        return "Review deleted.";
     }
 }

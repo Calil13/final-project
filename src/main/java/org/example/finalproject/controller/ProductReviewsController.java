@@ -30,4 +30,15 @@ public class ProductReviewsController {
     public void addReviews(@PathVariable Long productId, String comment) {
         productReviewsService.addReviews(productId, comment);
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PatchMapping("{reviewId}")
+    public void editReviews(@PathVariable Long reviewId, String editedComment) {
+        productReviewsService.editReviews(reviewId, editedComment);
+    }
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("{reviewId}")
+    public String deleteReview(@PathVariable Long reviewId) {
+        return productReviewsService.deleteReview(reviewId);
+    }
 }

@@ -14,6 +14,13 @@ public class JwtUtil {
 
     private final String SECRET = "N2YxMzM2NjYtMjE0ZS00Y2Y4LWI1MDktYmU1YjY4YjhjOTk5";
 
+    // 30 dəqiqə
+    private final long ADMIN_ACCESS_EXPIRATION = 1000 * 60 * 30;
+
+    public String generateAdminAccessToken(String email) {
+        return generateToken(email, ADMIN_ACCESS_EXPIRATION);
+    }
+
     // 12 saat
     private final long ACCESS_EXPIRATION = 1000 * 60 * 60 * 12;
 

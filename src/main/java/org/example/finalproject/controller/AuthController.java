@@ -62,13 +62,19 @@ public class AuthController {
     }
 
     @PostMapping("/password/reset")
-    public String resetPassword(@Valid @RequestBody UsersForgetPasswordDto forgetPasswor) {
-        return authService.resetPassword(forgetPasswor);
+    public String resetPassword(@Valid @RequestBody UsersForgetPasswordDto forgetPassword) {
+        return authService.resetPassword(forgetPassword);
     }
 
     @PostMapping("/login")
     public AuthResponseDto login(@Valid @RequestBody LoginRequestDto request) {
         return authService.login(request.getEmail(), request.getPassword());
+    }
+
+    @PostMapping("/admin/login")
+    public AuthResponseDto adminLogin(@Valid @RequestBody AdminLoginRequestDto request) {
+        return authService.adminLogin(request.getEmail(), request.getPassword()
+        );
     }
 
     @SecurityRequirement(name = "bearerAuth")

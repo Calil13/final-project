@@ -33,6 +33,29 @@ public class AuthService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
+    @Transactional
+    public AuthResponseDto adminLogin(String email, String password) {
+
+        var user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Admin not found!"));
+
+        if (user.getUserRole() != UserRole.ADMIN) {
+            throw new AccessDeniedException("You are not admin!");
+        }
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new WrongPasswordException("Password is wrong!");
+        }
+
+        String adminAccessToken = jwtUtil.generateAdminAccessToken(email);
+
+        user.setIsActive(true);
+        usersRepository.save(user);
+
+        return new AuthResponseDto(adminAccessToken, null);
+    }
+
+
     public String startRegistration(EmailSentOtpDto start) {
 
         if (usersRepository.findByEmail(start.getEmail()).isPresent()) {

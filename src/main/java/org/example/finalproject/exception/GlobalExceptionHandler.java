@@ -35,7 +35,19 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Already exists");
+        body.put("error", "Already exists.");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
+    @ExceptionHandler(AlreadyDeletedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto alreadyDeletedException(AlreadyDeletedException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Already deleted.");
         body.put("message", e.getMessage());
 
         return new ExceptionDto(body);

@@ -45,4 +45,7 @@ public class Users {
     private LocalDateTime createdAt;
 
     private Boolean isActive;
+
+    @Column(name = "deleted")
+    private Boolean deleted;
 }

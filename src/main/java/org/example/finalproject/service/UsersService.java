@@ -8,10 +8,7 @@ import org.example.finalproject.enums.PaymentMethod;
 import org.example.finalproject.enums.PaymentPurpose;
 import org.example.finalproject.enums.PaymentStatus;
 import org.example.finalproject.enums.UserRole;
-import org.example.finalproject.exception.AlreadyExistsException;
-import org.example.finalproject.exception.BadRequestException;
-import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.exception.WrongPasswordException;
+import org.example.finalproject.exception.*;
 import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.OtpRepository;
@@ -141,7 +138,6 @@ public class UsersService {
     }
 
     public String deleteAccount(UserCheckPassword checkPassword) {
-
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -153,7 +149,13 @@ public class UsersService {
             throw new WrongPasswordException("Enter the correct password!");
         }
 
-        usersRepository.delete(user);
+        if (user.getDeleted().equals(true)) {
+            log.error(String.valueOf(new AlreadyDeletedException("User delete column already is true!")));
+            throw new AlreadyDeletedException("User already deleted!");
+        }
+
+        user.setDeleted(true);
+        usersRepository.save(user);
 
         return "Account deleted!";
     }
@@ -208,21 +210,4 @@ public class UsersService {
         return "Customer successfully became a OWNER!";
 
     }
-
-//    private String validateCard(String cardNumber, String cvv, String expireDate) {
-//
-//        if (cardNumber == null || !cardNumber.matches("\\d{16}")) {
-//            return "Card number must be exactly 16 digits.";
-//        }
-//
-//        if (cvv == null || !cvv.matches("\\d{3}")) {
-//            return "CVV must be exactly 3 digits.";
-//        }
-//
-//        if (expireDate == null || !expireDate.matches("^(0[1-9]|1[0-2])/\\d{2}$")) {
-//            return "Expire date must be in MM/YY format.";
-//        }
-//
-//        return null;
-//    }
 }

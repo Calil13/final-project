@@ -2,6 +2,7 @@ package org.example.finalproject.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.*;
 import org.example.finalproject.entity.Address;
 import org.example.finalproject.entity.RefreshToken;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -32,29 +34,6 @@ public class AuthService {
     private final OtpService otpService;
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
-
-    @Transactional
-    public AuthResponseDto adminLogin(String email, String password) {
-
-        var user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Admin not found!"));
-
-        if (user.getUserRole() != UserRole.ADMIN) {
-            throw new AccessDeniedException("You are not admin!");
-        }
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new WrongPasswordException("Password is wrong!");
-        }
-
-        String adminAccessToken = jwtUtil.generateAdminAccessToken(email);
-
-        user.setIsActive(true);
-        usersRepository.save(user);
-
-        return new AuthResponseDto(adminAccessToken, null);
-    }
-
 
     public String startRegistration(EmailSentOtpDto start) {
 
@@ -80,6 +59,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(finish.getPassword()));
         user.setUserRole(UserRole.CUSTOMER);
         user.setPhone("+994" + finish.getPhone());
+        user.setDeleted(false);
 
         Address address = addressMapper.toEntity(finish.getAddress());
         address.setUser(user);
@@ -166,6 +146,11 @@ public class AuthService {
         Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found. Please register first."));
 
+        if(user.getUserRole() == UserRole.ADMIN) {
+            log.error("Admin must log in using the 'admin/login' method.");
+            throw new AccessDeniedException("LOGIN_ERROR");
+        }
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new WrongPasswordException("Password is Wrong!");
         }
@@ -186,6 +171,28 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
 
         return new AuthResponseDto(accessToken, refreshTokenStr);
+    }
+
+    @Transactional
+    public AuthResponseDto adminLogin(String email, String password) {
+
+        var user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Admin not found!"));
+
+        if (user.getUserRole() != UserRole.ADMIN) {
+            throw new AccessDeniedException("You are not admin!");
+        }
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new WrongPasswordException("Password is wrong!");
+        }
+
+        String adminAccessToken = jwtUtil.generateAdminAccessToken(email);
+
+        user.setIsActive(true);
+        usersRepository.save(user);
+
+        return new AuthResponseDto(adminAccessToken, null);
     }
 
     @Transactional

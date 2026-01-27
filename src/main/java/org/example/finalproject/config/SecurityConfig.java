@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
+                                "/auth/admin/login",
                                 "/auth/register/**",
                                 "/auth/refreshToken",
                                 "/auth/password/**",
@@ -39,22 +40,22 @@ public class SecurityConfig {
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/auth/logout").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                        .requestMatchers(HttpMethod.POST, "/auth/logout").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/products/").hasAuthority("ROLE_OWNER")
-                        .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ROLE_OWNER")
+                        .requestMatchers(HttpMethod.DELETE, "/products/").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/products").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/productImage/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAuthority("ROLE_OWNER")
-                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAuthority("ROLE_OWNER")
+                        .requestMatchers(HttpMethod.POST, "/productImage/**").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/productImage/**").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/productReviews/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/productReviews/**").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers(HttpMethod.PATCH, "/productReviews/**").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers(HttpMethod.DELETE, "/productReviews/**").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers("/payments/pay/").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers("/orders/**").hasAuthority("ROLE_CUSTOMER")
-                        .requestMatchers("/address/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
-                        .requestMatchers("/favorites/**").hasAuthority("ROLE_CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/productReviews/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/productReviews/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/productReviews/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers("/payments/pay/").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers("/orders/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers("/address/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_ADMIN")
+                        .requestMatchers("/favorites/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
                         .requestMatchers("/user/**").authenticated()
                         .anyRequest().authenticated()
                 )

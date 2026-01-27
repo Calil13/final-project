@@ -73,8 +73,7 @@ public class AuthController {
 
     @PostMapping("/admin/login")
     public AuthResponseDto adminLogin(@Valid @RequestBody AdminLoginRequestDto request) {
-        return authService.adminLogin(request.getEmail(), request.getPassword()
-        );
+        return authService.adminLogin(request.getEmail(), request.getPassword());
     }
 
     @SecurityRequirement(name = "bearerAuth")

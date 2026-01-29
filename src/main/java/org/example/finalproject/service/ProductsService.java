@@ -7,6 +7,7 @@ import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.entity.Users;
+import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
@@ -138,7 +139,9 @@ public class ProductsService {
         var product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found!"));
 
-        if (!product.getOwner().getId().equals(user.getId())) {
+        if (
+                user.getUserRole() != UserRole.ADMIN &&
+                !product.getOwner().getId().equals(user.getId())) {
             throw new AccessDeniedException("You are not allowed to delete this product!");
         }
 

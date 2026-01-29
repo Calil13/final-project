@@ -8,6 +8,8 @@ import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.UnexpectedException;
 import org.example.finalproject.mapper.CategoryMapper;
 import org.example.finalproject.repository.CategoryRepository;
+import org.example.finalproject.repository.UsersRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryService {
 
+    private final UsersRepository usersRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
@@ -53,10 +56,24 @@ public class CategoryService {
     }
 
     public void createCategory(CategoryDto categoryDto) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
         categoryRepository.save(categoryMapper.toEntity(categoryDto, null));
     }
 
     public void addSubcategory(Long id, CategoryDto subCategory) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
         Category parentCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Parent category not found!"));
 
@@ -69,6 +86,13 @@ public class CategoryService {
 
     @SuppressWarnings("LoggingSimilarMessage")
     public void editCategory(CategoryDto categoryDto, Long id) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
         var editCategory = categoryRepository.findById(id).orElseThrow(() -> {
             log.error("Category with Id {} not found", id);
             return new NotFoundException("Category not found!");
@@ -86,6 +110,13 @@ public class CategoryService {
 
     @SuppressWarnings("LoggingSimilarMessage")
     public void deleteCategory(Long id) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
         var category =  categoryRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Category with id {} not found :", id);

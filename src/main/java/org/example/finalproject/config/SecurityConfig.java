@@ -41,6 +41,9 @@ public class SecurityConfig {
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/auth/logout").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/category/**").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/category/**").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/category/**").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/category/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/products/").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")

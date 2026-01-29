@@ -7,6 +7,7 @@ import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.repository.UsersRepository;
+import org.example.finalproject.validation.ValidEmail;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 

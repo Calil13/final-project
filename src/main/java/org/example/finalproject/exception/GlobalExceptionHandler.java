@@ -243,6 +243,18 @@ public class GlobalExceptionHandler {
 //        return unexpectedException();
 //    }
 
+    @ExceptionHandler(UnexpectedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionDto unexpectedException(UnexpectedException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", "Unexpected Exception");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto unexpectedException(Exception e) {

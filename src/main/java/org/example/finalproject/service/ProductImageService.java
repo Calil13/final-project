@@ -5,6 +5,7 @@ import org.example.finalproject.dto.ProductImageDto;
 import org.example.finalproject.entity.ProductImage;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.exception.NotFoundException;
+import org.example.finalproject.exception.UnexpectedException;
 import org.example.finalproject.repository.ProductImageRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,12 +83,17 @@ public class ProductImageService {
         ProductImage image = productImageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Image not found!"));
 
-        String filePath = uploadPath + File.separator
-                + image.getImageUrl().replace("/uploads/", "");
+        Path fullPath = Paths.get(uploadPath)
+                .resolve(image.getImageUrl().replace("/uploads/", ""))
+                .normalize();
 
-        File file = new File(filePath);
-        if (file.exists()) {
-            file.delete();
+        try {
+            if (Files.exists(fullPath)) {
+                Files.delete(fullPath);
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while deleting the file!");
+            throw new UnexpectedException("An error occurred while deleting the file: " + fullPath);
         }
 
         productImageRepository.delete(image);

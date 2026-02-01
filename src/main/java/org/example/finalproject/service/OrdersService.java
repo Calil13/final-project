@@ -107,6 +107,7 @@ public class OrdersService {
         }
 
         if (order.getOrderStatus().equals(OrderStatus.DELIVERED)) {
+            log.error("The order has already been delivered!");
             throw new AlreadyExistsException("The order has already been delivered!");
         }
 
@@ -128,6 +129,7 @@ public class OrdersService {
         var product = order.getProduct();
 
         if (LocalDateTime.now().isBefore(order.getOrderDate())) {
+            log.error("The product has not expired yet.");
             return ResponseEntity.badRequest()
                     .body("The product has not expired yet.");
         }
@@ -138,6 +140,7 @@ public class OrdersService {
         order.setOrderStatus(OrderStatus.RETURNED);
         ordersRepository.save(order);
 
+        log.info("The product has been returned.");
         return ResponseEntity.ok("The product has been returned.");
     }
 
@@ -160,6 +163,7 @@ public class OrdersService {
         productsRepository.save(product);
         ordersRepository.delete(order);
 
+        log.info("The order has been cancelled.");
         return "The order has been cancelled.";
     }
 }

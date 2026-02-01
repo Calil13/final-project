@@ -1,6 +1,7 @@
 package org.example.finalproject.jwt;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.entity.Users;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.repository.UsersRepository;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,7 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws NotFoundException {
         Users user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+                .orElseThrow(() -> {
+                    log.error("User not found!");
+                    return new NotFoundException("ERROR");
+                });
 
         return User.builder()
                 .username(user.getEmail())

@@ -38,6 +38,7 @@ public class AuthService {
     public String startRegistration(EmailSentOtpDto start) {
 
         if (usersRepository.findByEmail(start.getEmail()).isPresent()) {
+            log.error("Used email added!");
             throw new AlreadyExistsException("Email is already in use!");
         }
 
@@ -46,12 +47,14 @@ public class AuthService {
 
     public String verifyOtp(EmailVerifyOtpDto verify) {
         otpService.verifyOtp(verify.getEmail(), verify.getOtp());
-        return "OTP verified!";
+        log.info("OTP verified.");
+        return "OTP verified.";
     }
 
     public String finishRegistration(RegisterFinishDto finish) {
 
         if (!otpService.isVerified(finish.getEmail())) {
+            log.error("OTP not verified!");
             throw new NotValidException("OTP not verified!");
         }
 
@@ -69,7 +72,8 @@ public class AuthService {
 
         otpService.removeOtp(finish.getEmail());
 
-        return "Customer successfully registered!";
+        log.info("New user registered.");
+        return "Customer successfully registered.";
     }
 
 
@@ -77,9 +81,13 @@ public class AuthService {
         String oldRefreshTokenStr = request.getRefreshToken();
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshTokenStr)
-                .orElseThrow(() -> new NotFoundException("Refresh token not found!"));
+                .orElseThrow(() -> {
+                    log.error("Refresh token not found!");
+                    return new NotFoundException("Refresh token not found!");
+                });
 
         if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            log.info("Refresh token is invalid or expired!");
             throw new NotValidException("Refresh token is invalid or expired!");
         }
 
@@ -105,15 +113,19 @@ public class AuthService {
 
     public String forgotPassword(EmailSentOtpDto sentOpt) {
 
-        var user = usersRepository.findByEmail(sentOpt.getEmail())
-                .orElseThrow(() -> new NotFoundException("Email not found!"));
+        usersRepository.findByEmail(sentOpt.getEmail())
+                .orElseThrow(() -> {
+                    log.error("Email not found!");
+                    return new NotFoundException("Email not found!");
+                });
 
         return otpService.sendOtp(sentOpt.getEmail());
     }
 
     public String verifyEmail(EmailVerifyOtpDto verifyOtp) {
         otpService.verifyOtp(verifyOtp.getEmail(), verifyOtp.getOtp());
-        return "OTP verified!";
+        log.info("OTP verified!");
+        return "OTP verified.";
     }
 
     public String resetPassword(UsersForgetPasswordDto forgetPassword) {
@@ -122,14 +134,17 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!otpService.isVerified(forgetPassword.getEmail())) {
-            throw new NotValidException("OTP is not verified!");
+            log.error("OTP is not verified.");
+            throw new NotValidException("OTP is not verified.");
         }
 
         if (!forgetPassword.getNewPassword().equals(forgetPassword.getConfirmNewPassword())) {
+            log.warn("New password and confirm password do not match!");
             throw new WrongPasswordException("Write the new code in the same way!");
         }
 
         if (passwordEncoder.matches(forgetPassword.getNewPassword(), user.getPassword())) {
+            log.warn("New password cannot be same as the old password!");
             throw new WrongPasswordException("New password cannot be same as the old password!");
         }
 
@@ -138,7 +153,8 @@ public class AuthService {
 
         otpService.removeOtp(user.getEmail());
 
-        return "Password updated successfully!";
+        log.info("Password updated successfully.");
+        return "Password updated successfully.";
     }
 
     @Transactional
@@ -146,12 +162,13 @@ public class AuthService {
         Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found. Please register first."));
 
-        if(user.getUserRole() == UserRole.ADMIN) {
+        if (user.getUserRole() == UserRole.ADMIN) {
             log.error("Admin must log in using the 'admin/login' method.");
             throw new AccessDeniedException("LOGIN_ERROR");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.error("Password is Wrong!");
             throw new WrongPasswordException("Password is Wrong!");
         }
 
@@ -180,10 +197,12 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("Admin not found!"));
 
         if (user.getUserRole() != UserRole.ADMIN) {
+            log.error("You are not admin!");
             throw new AccessDeniedException("You are not admin!");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.error("Password is wrong!");
             throw new WrongPasswordException("Password is wrong!");
         }
 
@@ -205,7 +224,8 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(logoutRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Password is incorrect");
+            log.error("Password is incorrect!");
+            throw new RuntimeException("Password is incorrect!");
         }
 
         var token = refreshTokenRepository.findByUser(user)

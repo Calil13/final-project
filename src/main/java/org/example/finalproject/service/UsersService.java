@@ -41,6 +41,7 @@ public class UsersService {
         var user = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
+        log.info("User's information returned");
         return usersMapper.toResponseDto(user);
     }
 
@@ -67,7 +68,8 @@ public class UsersService {
         user.setPhone("+994" + updatePhone.getNewPhone());
         usersRepository.save(user);
 
-        return "Phone updated successfully!";
+        log.info("User's phone updated successfully.");
+        return "Phone updated successfully.";
     }
 
     public String newEmailRequest(EmailSentOtpDto request, String email) {
@@ -107,7 +109,8 @@ public class UsersService {
 
         otpService.removeOtp(verify.getEmail());
 
-        return "Email updated successfully!";
+        log.info("User's email updated successfully.");
+        return "Email updated successfully.";
     }
 
     public String updatePassword(UsersUpdatePasswordRequestDto updatePassword) {
@@ -157,7 +160,8 @@ public class UsersService {
         user.setDeleted(true);
         usersRepository.save(user);
 
-        return "Account deleted!";
+        log.info("Account deleted.");
+        return "Account deleted.";
     }
 
     public String becomeOwner(OwnerRequestDto dto) {
@@ -207,7 +211,8 @@ public class UsersService {
         customer.setUserRole(UserRole.OWNER);
         usersRepository.save(customer);
 
-        return "Customer successfully became a OWNER!";
+        log.info("Customer successfully became a OWNER.");
+        return "Customer successfully became a OWNER.";
 
     }
 }

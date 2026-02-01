@@ -28,7 +28,10 @@ public class AddressService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var address = addressRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Address not found!"));
+                .orElseThrow(() -> {
+                    log.error("Address not found!");
+                    return new NotFoundException("Address not found!");
+                });
 
         return addressMapper.toResponseDto(address);
     }

@@ -147,6 +147,7 @@ public class ProductsService {
 
         productRepository.delete(product);
 
-        return "Product deleted successfully!";
+        log.info("Product deleted successfully.");
+        return "Product deleted successfully.";
     }
 }

@@ -98,6 +98,7 @@ public class ProductImageService {
 
         productImageRepository.delete(image);
 
-        return "Image deleted successfully!";
+        log.info("Image deleted successfully.");
+        return "Image deleted successfully.";
     }
 }

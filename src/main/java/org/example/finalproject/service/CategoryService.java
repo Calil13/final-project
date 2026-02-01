@@ -75,7 +75,10 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         Category parentCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Parent category not found!"));
+                .orElseThrow(() -> {
+                    log.error("Parent category not found!");
+                    return new  NotFoundException("Parent category not found!");
+                });
 
         Category newSubCategory = categoryMapper.toEntity(subCategory, parentCategory);
 

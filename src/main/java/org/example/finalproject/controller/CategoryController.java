@@ -4,10 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.example.finalproject.dto.CategoryCreateDto;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.service.CategoryService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +35,8 @@ public class CategoryController {
             summary = "Create new category",
             description = "Creates a new parent category."
     )
-    public void createCategory(@RequestBody CategoryDto categoryDto) {
-        categoryService.createCategory(categoryDto);
+    public void createCategory(@RequestBody CategoryCreateDto createDto) {
+        categoryService.createCategory(createDto);
     }
 
     @SecurityRequirement(name = "bearerAuth")
@@ -46,7 +45,7 @@ public class CategoryController {
             description = "Creates a subcategory under the given parent category ID"
     )
     @PostMapping("/{parentId}/sub")
-    public void addSubcategory(@PathVariable Long parentId, @RequestBody CategoryDto subCategory) {
+    public void addSubcategory(@PathVariable Long parentId, @RequestBody CategoryCreateDto subCategory) {
         categoryService.addSubcategory(parentId, subCategory);
     }
 

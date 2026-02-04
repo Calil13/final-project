@@ -2,6 +2,7 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.finalproject.dto.CategoryCreateDto;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.exception.NotFoundException;
@@ -54,7 +55,7 @@ public class CategoryService {
         return dto;
     }
 
-    public void createCategory(CategoryDto categoryDto) {
+    public void createCategory(CategoryCreateDto createDto) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -62,10 +63,12 @@ public class CategoryService {
         usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        categoryRepository.save(categoryMapper.toEntity(categoryDto, null));
+        log.info("A new category has been created.");
+
+        categoryRepository.save(categoryMapper.toEntity(createDto));
     }
 
-    public void addSubcategory(Long id, CategoryDto subCategory) {
+    public void addSubcategory(Long id, CategoryCreateDto subCategory) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();

@@ -1,6 +1,7 @@
 package org.example.finalproject.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductRequestDto {
-    private Long ownerId;
+public class ProductCreateDto {
     private Long categoryId;
     private String name;
     private String description;
+
+    @PositiveOrZero
     private BigDecimal price;
 }

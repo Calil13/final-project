@@ -2,6 +2,7 @@ package org.example.finalproject.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.ExceptionDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -117,6 +119,7 @@ public class GlobalExceptionHandler {
 
         body.put("message", errors);
 
+        log.error("Validation failed: {}", e.getMessage());
         return new ExceptionDto(body);
     }
 
@@ -258,11 +261,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto unexpectedException(Exception e) {
+        log.error("Unexpected exception occurred", e);
+
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", "Unexpected Exception");
-        body.put("message", e.getMessage());
+        body.put("error", "Internal Server Error");
+
+        body.put("message", "Unexpected error occurred. Please try again later.");
 
         return new ExceptionDto(body);
     }

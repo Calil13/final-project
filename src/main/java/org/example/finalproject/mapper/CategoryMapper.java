@@ -1,34 +1,21 @@
 package org.example.finalproject.mapper;
 
+import org.example.finalproject.dto.CategoryCreateDto;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.entity.Category;
 import org.mapstruct.Mapper;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
-    default Category toEntity(CategoryDto categoryDto, Category parent) {
-        if (categoryDto == null) return null;
+    Category toEntity(CategoryCreateDto createDto);
 
-        Category category = Category.builder()
-                .name(categoryDto.getName())
-                .parent(parent)
-                .build();
-
-        if (categoryDto.getSubCategory() != null) {
-            List<Category> subCategories = categoryDto.getSubCategory()
-                    .stream()
-                    .map(subDto -> toEntity(subDto, category))
-                    .collect(Collectors.toList());
-            category.setSubCategories(subCategories);
-        }
-
-        return category;
-
-    }
+    @Mapping(target = "name", source = "subCategory.name")
+    @Mapping(target = "parent", source = "parent")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "subCategories", ignore = true)
+    Category toEntity(CategoryCreateDto subCategory, Category parent);
 
     CategoryDto toDto(Category category);
 }

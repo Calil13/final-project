@@ -157,6 +157,7 @@ public class UsersService {
             throw new AlreadyDeletedException("User already deleted!");
         }
 
+        user.setIsActive(false);
         user.setDeleted(true);
         usersRepository.save(user);
 

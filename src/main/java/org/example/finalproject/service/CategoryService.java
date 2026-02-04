@@ -28,7 +28,6 @@ public class CategoryService {
 
         return category.stream()
                 .map(c -> CategoryDto.builder()
-                        .id(c.getId())
                         .name(c.getName())
                         .build())
                 .toList();

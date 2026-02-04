@@ -3,8 +3,10 @@ package org.example.finalproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.example.finalproject.dto.ProductRequestDto;
+import org.example.finalproject.dto.ProductCreateDto;
+import org.example.finalproject.dto.ProductUpdateDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.service.ProductsService;
 import org.springdoc.core.annotations.ParameterObject;
@@ -63,8 +65,8 @@ public class ProductController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
-    public ProductRequestDto addProduct(@RequestBody ProductRequestDto requestDto) {
-        return productService.addProduct(requestDto);
+    public ProductCreateDto addProduct(@Valid @RequestBody ProductCreateDto createDto) {
+        return productService.addProduct(createDto);
     }
 
     @Operation(
@@ -74,8 +76,8 @@ public class ProductController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping
-    public ProductRequestDto editProduct(@RequestBody ProductRequestDto requestDto) {
-        return productService.editProduct(requestDto);
+    public ProductUpdateDto editProduct(@Valid @RequestBody ProductUpdateDto updateDto) {
+        return productService.editProduct(updateDto);
     }
 
     @SecurityRequirement(name = "bearerAuth")

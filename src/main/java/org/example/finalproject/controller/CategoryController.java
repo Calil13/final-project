@@ -1,5 +1,6 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -31,14 +32,20 @@ public class CategoryController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Create new category",
+            description = "Creates a new parent category."
+    )
     public void createCategory(@RequestBody CategoryDto categoryDto) {
         categoryService.createCategory(categoryDto);
     }
 
     @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Add subcategory",
+            description = "Creates a subcategory under the given parent category ID"
+    )
     @PostMapping("/{parentId}/sub")
-    @ResponseStatus(HttpStatus.CREATED)
     public void addSubcategory(@PathVariable Long parentId, @RequestBody CategoryDto subCategory) {
         categoryService.addSubcategory(parentId, subCategory);
     }

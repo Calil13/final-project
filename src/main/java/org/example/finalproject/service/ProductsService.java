@@ -2,11 +2,11 @@ package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.finalproject.dto.ProductRequestDto;
+import org.example.finalproject.dto.ProductCreateDto;
+import org.example.finalproject.dto.ProductUpdateDto;
 import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
-import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.NotFoundException;
@@ -60,44 +60,43 @@ public class ProductsService {
         return products.map(productsMapper::toDto);
     }
 
-    public ProductRequestDto addProduct(ProductRequestDto requestDto) {
-
-        Users owner = usersRepository.findById(requestDto.getOwnerId())
-                .orElseThrow(() -> {
-                    log.error("Owner not found with id: {}", requestDto.getOwnerId());
-                    return new NotFoundException("Owner not found");
-                });
-
-        Category category = categoryRepository.findById(requestDto.getCategoryId())
-                .orElseThrow(() -> {
-                    log.error("Category not found with id: {}", requestDto.getCategoryId());
-                    return new NotFoundException("Category not found");
-                });
-
-        Products products = productsMapper.toEntity(requestDto, owner, category);
-
-        productRepository.save(products);
-
-        return productsMapper.toDtoRequest(products);
-    }
-
-    public ProductRequestDto editProduct(ProductRequestDto requestDto) {
-
+    public ProductCreateDto addProduct(ProductCreateDto createDto) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var owner = usersRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new NotFoundException("Owner not found!"));
+
+        Category category = categoryRepository.findById(createDto.getCategoryId())
+                .orElseThrow(() -> {
+                    log.error("Category not found with id: {}", createDto.getCategoryId());
+                    return new NotFoundException("Category not found");
+                });
+
+        Products products = productsMapper.toEntity(createDto, owner, category);
+
+        productRepository.save(products);
+
+        return productsMapper.toDtoCreate(products);
+    }
+
+    public ProductUpdateDto editProduct(ProductUpdateDto requestDto) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var product = productRepository.findByOwner(user)
+        var product = productRepository.findById(requestDto.getProductId())
                 .orElseThrow(() -> {
                     log.error("Product not found!");
                     return new NotFoundException("Product not found!");
                 });
 
-        if(!product.getOwner().getId().equals(requestDto.getOwnerId())) {
-            throw new AccessDeniedException("You can only edit your own products");
+        if(!product.getOwner().getEmail().equals(currentEmail)) {
+            throw new AccessDeniedException("You can only edit your own products.");
         }
 
         var category = categoryRepository.findById(requestDto.getCategoryId())
@@ -124,7 +123,7 @@ public class ProductsService {
 
         productRepository.save(product);
 
-        return productsMapper.toDtoRequest(product);
+        return productsMapper.toDtoUpdate(product);
     }
 
     public String deleteProduct(Long id) {

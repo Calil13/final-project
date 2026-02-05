@@ -51,8 +51,8 @@ public class CategoryController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/{id}")
-    public void editCategory(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
-        categoryService.editCategory(categoryDto, id);
+    public void editCategory(@RequestBody CategoryCreateDto editedDto, @PathVariable Long id) {
+        categoryService.editCategory(editedDto, id);
     }
 
     @SecurityRequirement(name = "bearerAuth")

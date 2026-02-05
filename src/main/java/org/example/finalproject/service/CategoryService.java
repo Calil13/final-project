@@ -90,7 +90,7 @@ public class CategoryService {
     }
 
     @SuppressWarnings("LoggingSimilarMessage")
-    public void editCategory(CategoryDto categoryDto, Long id) {
+    public void editCategory(CategoryCreateDto editedDto, Long id) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -98,19 +98,16 @@ public class CategoryService {
         usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        var editCategory = categoryRepository.findById(id).orElseThrow(() -> {
+        var category = categoryRepository.findById(id).orElseThrow(() -> {
             log.error("Category with Id {} not found", id);
             return new NotFoundException("Category not found!");
         });
 
-        if (categoryDto.getName() != null) {
-            editCategory.setName(categoryDto.getName());
-        } else {
-            log.error("JSON format is wrong!");
-            throw new UnexpectedException("JSON only accepts a name parameter!");
-        }
+        category.setName(editedDto.getName());
 
-        categoryRepository.save(editCategory);
+        log.info("Category edited. \nId: {}\nOld Name: {}\nNew Name: {}", id, category.getName(), editedDto.getName());
+
+        categoryRepository.save(category);
     }
 
     @SuppressWarnings("LoggingSimilarMessage")
@@ -128,6 +125,7 @@ public class CategoryService {
                     return new NotFoundException("Category not found!");
                 });
 
+        log.info("Category deleted.\nId: {}\nName: {}", id, category.getName());
         categoryRepository.delete(category);
     }
 }

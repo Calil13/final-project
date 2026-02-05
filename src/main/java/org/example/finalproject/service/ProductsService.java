@@ -9,6 +9,7 @@ import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AccessDeniedException;
+import org.example.finalproject.exception.InvalidCategoryOperationException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.CategoryRepository;
@@ -74,6 +75,11 @@ public class ProductsService {
                     return new NotFoundException("Category not found");
                 });
 
+        if (category.getParent() == null) {
+            log.error("Product cannot be added to a parent category.");
+            throw new InvalidCategoryOperationException("Product cannot be added to a parent category.");
+        }
+
         Products products = productsMapper.toEntity(createDto, owner, category);
 
         productRepository.save(products);
@@ -127,7 +133,6 @@ public class ProductsService {
     }
 
     public String deleteProduct(Long id) {
-
         String vendorEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -146,7 +151,7 @@ public class ProductsService {
 
         productRepository.delete(product);
 
-        log.info("Product deleted successfully.");
+        log.info("Product deleted successfully. \nId: {}\nProduct Name: {}", id, product.getName());
         return "Product deleted successfully.";
     }
 }

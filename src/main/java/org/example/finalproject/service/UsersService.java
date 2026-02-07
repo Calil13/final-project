@@ -9,6 +9,7 @@ import org.example.finalproject.enums.PaymentPurpose;
 import org.example.finalproject.enums.PaymentStatus;
 import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.*;
+import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.OtpRepository;
@@ -32,6 +33,7 @@ public class UsersService {
     private final PaymentRepository paymentRepository;
     private final PaymentsService paymentsService;
     private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
     public UserResponseDto getUserInfo() {
         String currentEmail = SecurityContextHolder.getContext()
@@ -39,10 +41,48 @@ public class UsersService {
                 .getName();
 
         var user = usersRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+                .orElseThrow(() -> {
+                    log.error("User not found.");
+                    return new NotFoundException("User not found!");
+                });
 
-        log.info("User's information returned");
-        return usersMapper.toResponseDto(user);
+        var address = addressRepository.findByUser(user)
+                .orElseThrow(() -> {
+                    log.error("Address not found for user ID: {}", user.getId());
+                    return new NotFoundException("Address not found!");
+                });
+
+        var addressDto = addressMapper.toDto(address);
+
+        log.info("User's information returned.");
+        return usersMapper.toResponseDto(user, addressDto);
+    }
+
+    public UserResponsePublicDto getUserInfoPublic(Long id) {
+        var user = usersRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found!");
+                    return new NotFoundException("User not found!");
+                });
+
+        if (user.getUserRole().equals(UserRole.ADMIN)) {
+            log.error("An exception was thrown because the ADMIN id was entered.");
+            throw new NotFoundException("User not found!");
+        } else if (user.getDeleted().equals(true)) {
+            log.error("Requested to return deleted account. Account ID: {}", id);
+            throw new NotFoundException("User not found!");
+        }
+
+        var address = addressRepository.findByUser(user)
+                .orElseThrow(() -> {
+                    log.error("Address not found for user ID: {}", user.getId());
+                    return new NotFoundException("Address not found!");
+                });
+
+        var addressDto = addressMapper.toDto(address);
+
+        log.info("User's information returned for customer.");
+        return usersMapper.toResponsePublicDto(user, addressDto);
     }
 
     public UsersUpdateFullNameRequestDto updateFullNameRequest(UsersUpdateFullNameRequestDto update, String email) {

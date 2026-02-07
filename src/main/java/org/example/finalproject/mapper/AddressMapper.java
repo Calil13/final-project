@@ -3,17 +3,12 @@ package org.example.finalproject.mapper;
 import org.example.finalproject.dto.AddressDto;
 import org.example.finalproject.entity.Address;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AddressMapper {
 
-    default AddressDto toDto(Address address) {
-        return AddressDto.builder()
-                .city(address.getCity())
-                .street(address.getStreet())
-                .home(address.getHome())
-                .build();
-    }
+    AddressDto toDto(Address address);
 
     Address toEntity(AddressDto addressDto);
 

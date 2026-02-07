@@ -23,6 +23,11 @@ public class UsersController {
         return usersService.getUserInfo();
     }
 
+    @GetMapping("/public/{id}")
+    public UserResponsePublicDto getUserInfoPublic(@PathVariable Long id) {
+        return usersService.getUserInfoPublic(id);
+    }
+
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/updateFullName")
     public UsersUpdateFullNameRequestDto updateFullNameRequest(@RequestBody UsersUpdateFullNameRequestDto update, Authentication authentication) {

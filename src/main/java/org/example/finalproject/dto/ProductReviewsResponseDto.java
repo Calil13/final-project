@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductReviewsResponseDto {
+    private String userName;
     private String comment;
 }

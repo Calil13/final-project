@@ -7,6 +7,7 @@ import org.example.finalproject.entity.ProductReview;
 import org.example.finalproject.exception.IllegalStateException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductReviewsMapper;
+import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.ProductReviewRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProductReviewsService {
 
     private final UsersRepository usersRepository;
+    private final UsersMapper usersMapper;
     private final ProductsRepository productsRepository;
     private final ProductReviewRepository productReviewRepository;
     private final ProductReviewsMapper productReviewsMapper;
@@ -29,11 +31,22 @@ public class ProductReviewsService {
     public Page<ProductReviewsResponseDto> getReviews(Pageable pageable, Long productId) {
 
         var product = productsRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found!"));
+                .orElseThrow(() -> {
+                    log.error("Product not found!");
+                    return new NotFoundException("Product not found!");
+                });
+
+        var productReview = productReviewRepository.findUserByProduct(product)
+                .orElseThrow(() -> {
+                    log.error("Review not found for product with id={}", productId);
+                    return new NotFoundException("Review not found!");
+                });
 
         Page<ProductReview> reviews = productReviewRepository.findReviewsByProduct(product, pageable);
 
-        return reviews.map(productReviewsMapper::toDto);
+        log.info("Returned comment with id={} for product with id={}", productReview.getId(), product);
+
+        return reviews.map(review -> productReviewsMapper.toDto(review, productReview.getCustomer().getName()));
     }
 
     public void addReviews(Long productId, String comment) {
@@ -71,7 +84,7 @@ public class ProductReviewsService {
 
         var review = productReviewRepository.findById(reviewId)
                 .orElseThrow(() -> {
-                    log.error("Review not found.");
+                    log.error("Review not found!");
                     return new NotFoundException("Review not found!");
                 });
 
@@ -89,7 +102,7 @@ public class ProductReviewsService {
 
         var review = productReviewRepository.findById(reviewId)
                 .orElseThrow(() -> {
-                    log.error("Review not found!");
+                    log.error("Review not found.");
                     return new NotFoundException("Review not found!");
                 });
 

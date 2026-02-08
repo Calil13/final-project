@@ -16,6 +16,8 @@ public interface UsersMapper {
     @Mapping(target = "address", source = "addressDto")
     UserResponsePublicDto toResponsePublicDto(Users user, AddressDto addressDto);
 
+    UserResponseDto toDto(String userName);
+
     default UsersUpdateFullNameRequestDto toFullNameDto(Users users) {
         return UsersUpdateFullNameRequestDto.builder()
                 .name(users.getName())

@@ -3,6 +3,7 @@ package org.example.finalproject.repository;
 import jakarta.persistence.Id;
 import org.example.finalproject.dto.AddressDto;
 import org.example.finalproject.entity.Address;
+import org.example.finalproject.entity.Products;
 import org.example.finalproject.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 

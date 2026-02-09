@@ -11,7 +11,9 @@ import org.example.finalproject.enums.UserRole;
 import org.example.finalproject.exception.AccessDeniedException;
 import org.example.finalproject.exception.InvalidCategoryOperationException;
 import org.example.finalproject.exception.NotFoundException;
+import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.mapper.ProductsMapper;
+import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.CategoryRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
@@ -29,6 +31,7 @@ public class ProductsService {
     private final ProductsMapper productsMapper;
     private final CategoryRepository categoryRepository;
     private final UsersRepository usersRepository;
+    private final AddressRepository addressRepository;
 
     public Page<ProductResponseDto> getProducts(Pageable pageable) {
         Page<Products> productsPage = productRepository.findAll(pageable);
@@ -42,7 +45,15 @@ public class ProductsService {
                     return new NotFoundException("Product not found!");
                 });
 
-        return productsMapper.toDto(product);
+        var user = product.getOwner();
+
+        var address = addressRepository.findByUser(user)
+                .orElseThrow(() -> {
+                    log.error("Address not found for user with ID {}", user.getId());
+                    return new NotFoundException("Address not found!");
+                });
+
+        return productsMapper.toDto(product, address);
     }
 
     public Page<ProductResponseDto> getProductsByCategory(Long categoryId, Pageable pageable) {

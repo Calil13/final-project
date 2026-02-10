@@ -8,10 +8,9 @@ import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.enums.UserRole;
-import org.example.finalproject.exception.AccessDeniedException;
+import org.example.finalproject.exception.ProductInUseException;
 import org.example.finalproject.exception.InvalidCategoryOperationException;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.CategoryRepository;
@@ -113,7 +112,7 @@ public class ProductsService {
                 });
 
         if(!product.getOwner().getEmail().equals(currentEmail)) {
-            throw new AccessDeniedException("You can only edit your own products.");
+            throw new ProductInUseException("You can only edit your own products.");
         }
 
         var category = categoryRepository.findById(requestDto.getCategoryId())
@@ -157,7 +156,12 @@ public class ProductsService {
         if (
                 user.getUserRole() != UserRole.ADMIN &&
                 !product.getOwner().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You are not allowed to delete this product!");
+            throw new ProductInUseException("You are not allowed to delete this product!");
+        }
+
+        if(product.getIsAvailable() == false) {
+            log.error("An attempt was made to delete the ordered product.");
+            throw new ProductInUseException("Product is in use and cannot be deleted.");
         }
 
         productRepository.delete(product);

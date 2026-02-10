@@ -10,6 +10,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProductReviewsMapper {
 
-    @Mapping(target = "userName", source = "name")
+    @Mapping(target = "customerName", source = "name")
     ProductReviewsResponseDto toDto(ProductReview review, String name);
 }

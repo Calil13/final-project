@@ -36,17 +36,11 @@ public class ProductReviewsService {
                     return new NotFoundException("Product not found!");
                 });
 
-        var productReview = productReviewRepository.findUserByProduct(product)
-                .orElseThrow(() -> {
-                    log.error("Review not found for product with id={}", productId);
-                    return new NotFoundException("Review not found!");
-                });
-
         Page<ProductReview> reviews = productReviewRepository.findReviewsByProduct(product, pageable);
 
-        log.info("Returned comment with id={} for product with id={}", productReview.getId(), product);
+        log.info("Returned comment for product with id={}", product.getId());
 
-        return reviews.map(review -> productReviewsMapper.toDto(review, productReview.getCustomer().getName()));
+        return reviews.map(review -> productReviewsMapper.toDto(review, review.getCustomer().getName()));
     }
 
     public void addReviews(Long productId, String comment) {
@@ -71,6 +65,7 @@ public class ProductReviewsService {
                 .customer(customer)
                 .build();
 
+        log.info("Review added for product with ID: {}", productId);
         productReviewRepository.save(review);
     }
 
@@ -108,6 +103,7 @@ public class ProductReviewsService {
 
         productReviewRepository.delete(review);
 
+        log.warn("Review deleted for ID: {}", reviewId);
         return "Review deleted.";
     }
 }

@@ -206,13 +206,15 @@ public class UsersService {
     }
 
     public String becomeOwner(OwnerRequestDto dto) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
 
-        var customer = usersRepository.findById(dto.getUserId())
+        var customer = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> {
                     log.error("Customer not found!");
                     return new NotFoundException("Customer not found!");
                 });
-
 
         if (customer.getUserRole() == UserRole.OWNER) {
             log.error("User is already a owner!");
@@ -226,6 +228,7 @@ public class UsersService {
         String validationError = paymentsService.validateCard(cardNumber, cvv, expireDate);
 
         if (validationError != null) {
+            log.error("Payment failed for becoming an owner. \n{}", validationError);
             return "Payment FAILED! \n" + validationError;
         }
 
@@ -252,7 +255,7 @@ public class UsersService {
         customer.setUserRole(UserRole.OWNER);
         usersRepository.save(customer);
 
-        log.info("Customer successfully became a OWNER.");
+        log.info("Customer ID {}: Status updated to OWNER successfully.", customer.getId());
         return "Customer successfully became a OWNER.";
 
     }

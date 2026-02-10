@@ -68,7 +68,7 @@ public class UsersController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/becomeOwner")
-    public String becomeOwner(@RequestBody OwnerRequestDto ownerRequestDTO) {
+    public String becomeOwner(@Valid @RequestBody OwnerRequestDto ownerRequestDTO) {
         return usersService.becomeOwner(ownerRequestDTO);
     }
 }

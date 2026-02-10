@@ -224,6 +224,18 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(body);
     }
 
+    @ExceptionHandler(ProductInUseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleProductInUse(ProductInUseException e) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "PRODUCT_IN_USE");
+        body.put("message", e.getMessage());
+
+        return new ExceptionDto(body);
+    }
 
     public static void accessDeniedResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.FORBIDDEN.value());

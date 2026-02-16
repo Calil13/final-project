@@ -51,6 +51,9 @@ public class AddressService {
         address.setStreet(addressDto.getStreet());
         address.setHome(addressDto.getHome());
 
-        return "Address changed successfully!";
+        addressRepository.save(address);
+
+        log.info("Address updated for user with ID: {}", user.getId());
+        return "Address changed successfully.";
     }
 }

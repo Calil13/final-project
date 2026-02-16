@@ -35,6 +35,7 @@ public class UsersService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
+    @SuppressWarnings("LoggingSimilarMessage")
     public UserResponseDto getUserInfo() {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()

@@ -1,6 +1,5 @@
 package org.example.finalproject.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.entity.Orders;
@@ -20,7 +19,6 @@ public class OverdueEmailService {
     private final OrdersRepository ordersRepository;
     private final EmailService emailService;
 
-    @Transactional
     public void notifyOverdueOrders() {
 
         LocalDateTime now = LocalDateTime.now();

@@ -40,8 +40,7 @@ public class ProductImageService {
         List<ProductImage> productImage = productImageRepository.findByProductId(productId);
 
         if (productImage.isEmpty()) {
-            log.error("Images not found for this product!");
-            throw new NotFoundException("Images not found for this product!");
+            log.warn("Images not found for product with ID {}", productId);
         }
 
         return productImage.stream()
@@ -52,7 +51,7 @@ public class ProductImageService {
     public List<ProductImageDto> uploadImage(Long productId, List<MultipartFile> files) {
         Products products = productRepository.findById(productId)
                 .orElseThrow(() -> {
-                    log.error("Product not found for this images!");
+                    log.error("Product not found for images!");
                     return new NotFoundException("Product not found!");
                 });
 

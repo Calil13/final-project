@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.ProductReviewsResponseDto;
 import org.example.finalproject.entity.ProductReview;
+import org.example.finalproject.exception.GlobalExceptionHandler;
 import org.example.finalproject.exception.IllegalStateException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductReviewsMapper;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProductReviewsService {
 
     private final UsersRepository usersRepository;
-    private final UsersMapper usersMapper;
     private final ProductsRepository productsRepository;
     private final ProductReviewRepository productReviewRepository;
     private final ProductReviewsMapper productReviewsMapper;
@@ -32,7 +32,7 @@ public class ProductReviewsService {
 
         var product = productsRepository.findById(productId)
                 .orElseThrow(() -> {
-                    log.error("Product not found!");
+                    log.error("Product not found with ID: {}", productId);
                     return new NotFoundException("Product not found!");
                 });
 
@@ -74,7 +74,7 @@ public class ProductReviewsService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var review = productReviewRepository.findById(reviewId)
@@ -82,6 +82,12 @@ public class ProductReviewsService {
                     log.error("Review not found!");
                     return new NotFoundException("Review not found!");
                 });
+
+        if (!customer.getId().equals(review.getCustomer().getId())) {
+            log.error("Unauthorized edit attempt. UserId: {}, ReviewId: {}",
+                    customer.getId(), reviewId);
+            throw new IllegalStateException("You are not allowed to edit this review!");
+        }
 
         review.setComment(editedComment);
         productReviewRepository.save(review);
@@ -92,7 +98,7 @@ public class ProductReviewsService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var review = productReviewRepository.findById(reviewId)
@@ -100,6 +106,12 @@ public class ProductReviewsService {
                     log.error("Review not found.");
                     return new NotFoundException("Review not found!");
                 });
+
+        if (!customer.getId().equals(review.getCustomer().getId())) {
+            log.error("Unauthorized delete attempt. UserId: {}, ReviewId: {}",
+                    customer.getId(), reviewId);
+            throw new IllegalStateException("You are not allowed to edit this review!");
+        }
 
         productReviewRepository.delete(review);
 

@@ -12,7 +12,6 @@ import org.example.finalproject.exception.*;
 import org.example.finalproject.mapper.AddressMapper;
 import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.AddressRepository;
-import org.example.finalproject.repository.OtpRepository;
 import org.example.finalproject.repository.PaymentRepository;
 import org.example.finalproject.repository.UsersRepository;
 import org.springframework.security.core.context.SecurityContextHolder;

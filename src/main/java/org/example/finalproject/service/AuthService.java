@@ -37,7 +37,7 @@ public class AuthService {
 
     public String startRegistration(EmailSentOtpDto start) {
 
-        if (usersRepository.findByEmail(start.getEmail()).isPresent()) {
+        if (usersRepository.findByEmailAndDeletedFalse(start.getEmail()).isPresent()) {
             log.error("Used email added!");
             throw new AlreadyExistsException("Email is already in use!");
         }
@@ -86,12 +86,18 @@ public class AuthService {
                     return new NotFoundException("Refresh token not found!");
                 });
 
+        var user = storedToken.getUser();
+
+        if (user.getDeleted().equals(true)) {
+            log.error("Refresh token validation failed: account is deleted. userId={}", user.getId());
+            throw  new NotFoundException("User not found!");
+        }
+
         if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             log.info("Refresh token is invalid or expired!");
             throw new NotValidException("Refresh token is invalid or expired!");
         }
 
-        Users user = storedToken.getUser();
         String email = user.getEmail();
 
         refreshTokenRepository.delete(storedToken);
@@ -113,7 +119,7 @@ public class AuthService {
 
     public String forgotPassword(EmailSentOtpDto sentOpt) {
 
-        usersRepository.findByEmail(sentOpt.getEmail())
+        usersRepository.findByEmailAndDeletedFalse(sentOpt.getEmail())
                 .orElseThrow(() -> {
                     log.error("Email not found!");
                     return new NotFoundException("Email not found!");
@@ -130,7 +136,7 @@ public class AuthService {
 
     public String resetPassword(UsersForgetPasswordDto forgetPassword) {
 
-        var user = usersRepository.findByEmail(forgetPassword.getEmail())
+        var user = usersRepository.findByEmailAndDeletedFalse(forgetPassword.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!otpService.isVerified(forgetPassword.getEmail())) {
@@ -140,7 +146,7 @@ public class AuthService {
 
         if (!forgetPassword.getNewPassword().equals(forgetPassword.getConfirmNewPassword())) {
             log.warn("New password and confirm password do not match!");
-            throw new WrongPasswordException("Write the new code in the same way!");
+            throw new WrongPasswordException("newPassword and confirmNewPassword must be the same!");
         }
 
         if (passwordEncoder.matches(forgetPassword.getNewPassword(), user.getPassword())) {
@@ -159,7 +165,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDto login(String email, String password) {
-        Users user = usersRepository.findByEmail(email)
+        Users user = usersRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new NotFoundException("User not found. Please register first."));
 
         if (user.getUserRole() == UserRole.ADMIN) {
@@ -194,7 +200,7 @@ public class AuthService {
     @Transactional
     public AuthResponseDto adminLogin(String email, String password) {
 
-        var user = usersRepository.findByEmail(email)
+        var user = usersRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new NotFoundException("Admin not found!"));
 
         if (user.getUserRole() != UserRole.ADMIN) {
@@ -221,7 +227,7 @@ public class AuthService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(logoutRequest.getPassword(), user.getPassword())) {

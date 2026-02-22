@@ -47,7 +47,7 @@ class AuthServiceTest extends Specification {
     def "startRegistration - should send OTP when email is not in use"() {
         given:
         def dto = new EmailSentOtpDto(email: "test@example.com")
-        usersRepository.findByEmail(dto.email) >> Optional.empty()
+        usersRepository.findByEmailAndDeletedFalse(dto.email) >> Optional.empty()
 
         when:
         def result = authService.startRegistration(dto)
@@ -60,7 +60,7 @@ class AuthServiceTest extends Specification {
     def "startRegistration - should throw AlreadyExistsException when email exists"() {
         given:
         def dto = new EmailSentOtpDto(email: "existing@example.com")
-        usersRepository.findByEmail(dto.email) >> Optional.of(new Users())
+        usersRepository.findByEmailAndDeletedFalse(dto.email) >> Optional.of(new Users())
 
         when:
         authService.startRegistration(dto)
@@ -101,7 +101,7 @@ class AuthServiceTest extends Specification {
         def password = "password"
         def user = new Users(email: email, password: "hashedPassword", userRole: UserRole.CUSTOMER)
 
-        usersRepository.findByEmail(email) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         passwordEncoder.matches(password, "hashedPassword") >> true
         jwtUtil.generateAccessToken(email) >> "access-token"
         jwtUtil.generateRefreshToken() >> "refresh-token"
@@ -120,7 +120,7 @@ class AuthServiceTest extends Specification {
     def "login - should throw ProductInUseException when admin tries to login as user"() {
         given:
         def user = new Users(userRole: UserRole.ADMIN)
-        usersRepository.findByEmail("admin@test.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("admin@test.com") >> Optional.of(user)
 
         when:
         authService.login("admin@test.com", "any")
@@ -164,7 +164,7 @@ class AuthServiceTest extends Specification {
         )
         def user = new Users(email: dto.email, password: "oldHashedPassword")
 
-        usersRepository.findByEmail(dto.email) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(dto.email) >> Optional.of(user)
         otpService.isVerified(dto.email) >> true
         passwordEncoder.matches(dto.newPassword, "oldHashedPassword") >> false
         passwordEncoder.encode(dto.newPassword) >> "newHashedPassword"
@@ -191,7 +191,7 @@ class AuthServiceTest extends Specification {
         securityContext.getAuthentication() >> auth
         SecurityContextHolder.setContext(securityContext)
 
-        usersRepository.findByEmail(email) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         passwordEncoder.matches(password, "hashedPassword") >> true
         refreshTokenRepository.findByUser(user) >> Optional.of(token)
 

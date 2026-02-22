@@ -76,7 +76,7 @@ public class ProductsService {
                 .getAuthentication()
                 .getName();
 
-        var owner = usersRepository.findByEmail(currentEmail)
+        var owner = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Owner not found!"));
 
         Category category = categoryRepository.findById(createDto.getCategoryId())
@@ -102,7 +102,7 @@ public class ProductsService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var product = productRepository.findById(requestDto.getProductId())
@@ -147,7 +147,7 @@ public class ProductsService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(vendorEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(vendorEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var product = productRepository.findById(id)

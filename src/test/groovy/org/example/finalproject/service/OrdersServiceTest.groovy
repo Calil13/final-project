@@ -54,7 +54,7 @@ class OrdersServiceTest extends Specification {
 
         def dto = new OrdersDto(productId: 1L, day: 3)
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
         productsRepository.findById(1L) >> Optional.of(product)
 
         when:
@@ -78,7 +78,7 @@ class OrdersServiceTest extends Specification {
 
         def dto = new OrdersDto(productId: 1L, day: 2)
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
         productsRepository.findById(1L) >> Optional.of(product)
 
         when:
@@ -97,7 +97,7 @@ class OrdersServiceTest extends Specification {
             getPaymentMethod() >> PaymentMethod.CASH
         }
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
         ordersRepository.findById(1L) >> Optional.of(order)
         paymentRepository.findByOrder(order) >> Optional.of(payment)
 
@@ -119,7 +119,7 @@ class OrdersServiceTest extends Specification {
                 paymentStatus: PaymentStatus.PENDING
         )
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
         ordersRepository.findById(1L) >> Optional.of(order)
         paymentRepository.findByOrder(order) >> Optional.of(payment)
 
@@ -136,7 +136,7 @@ class OrdersServiceTest extends Specification {
         def product = new Products(isAvailable: false)
         def order = new Orders(product: product)
 
-        usersRepository.findByEmail(_) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_) >> Optional.of(user)
         productsRepository.findById(1L) >> Optional.of(product)
         ordersRepository.findByProduct(product) >> Optional.of(order)
 

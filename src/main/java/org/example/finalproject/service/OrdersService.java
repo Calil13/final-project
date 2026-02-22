@@ -39,7 +39,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var address = addressRepository.findByUser(user)
@@ -55,7 +55,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var product = productsRepository.findById(ordersDto.getProductId())
@@ -90,7 +90,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var order = ordersRepository.findById(orderId)
@@ -117,7 +117,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var order = ordersRepository.findById(orderId)
@@ -146,7 +146,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var product = productsRepository.findById(productId)

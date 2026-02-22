@@ -244,7 +244,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", 403);
-        body.put("error", "Access Denied");
+        body.put("error", "Access Denied.");
         body.put("message", "Your role does not allow you to perform this operation.");
 
         new ObjectMapper().writeValue(response.getOutputStream(), body);

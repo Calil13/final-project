@@ -49,7 +49,7 @@ class PaymentsServiceTest extends Specification {
                 amount: 100
         )
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(customer)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(customer)
         ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED) >> Optional.of(order)
 
         when:
@@ -74,7 +74,7 @@ class PaymentsServiceTest extends Specification {
                 amount: 100
         )
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(customer)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(customer)
         ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED) >> Optional.of(order)
 
         when:
@@ -97,7 +97,7 @@ class PaymentsServiceTest extends Specification {
                 amount: 100
         )
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(customer)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(customer)
         ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED) >> Optional.of(order)
 
         when:
@@ -116,7 +116,7 @@ class PaymentsServiceTest extends Specification {
                 deliveryType: DeliveryType.DELIVERY
         )
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(customer)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(customer)
         ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED) >> Optional.of(order)
 
         when:
@@ -132,7 +132,7 @@ class PaymentsServiceTest extends Specification {
         given:
         Users customer = new Users(email: "test@mail.com")
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(customer)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(customer)
         ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED) >> Optional.empty()
 
         when:

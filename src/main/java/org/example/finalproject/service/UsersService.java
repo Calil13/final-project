@@ -40,7 +40,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> {
                     log.error("User not found.");
                     return new NotFoundException("User not found!");
@@ -86,7 +86,7 @@ public class UsersService {
     }
 
     public UsersUpdateFullNameRequestDto updateFullNameRequest(UsersUpdateFullNameRequestDto update, String email) {
-        var user = usersRepository.findByEmail(email)
+        var user = usersRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setName(update.getName());
@@ -102,7 +102,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setPhone("+994" + updatePhone.getNewPhone());
@@ -113,7 +113,7 @@ public class UsersService {
     }
 
     public String newEmailRequest(EmailSentOtpDto request, String email) {
-        var users = usersRepository.findByEmail(email)
+        var users = usersRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> {
                     log.error("Email not found!");
                     return new NotFoundException("Email not found!");
@@ -141,7 +141,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setEmail(verify.getEmail());
@@ -159,7 +159,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(updatePassword.getCurrentPassword(), user.getPassword())) {
@@ -185,7 +185,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(checkPassword.getPassword(), user.getPassword())) {
@@ -201,7 +201,7 @@ public class UsersService {
         user.setDeleted(true);
         usersRepository.save(user);
 
-        log.info("Account deleted.");
+        log.info("Deleted account | accountId={} | timestamp={}", user.getId(), LocalDateTime.now());
         return "Account deleted.";
     }
 
@@ -210,7 +210,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> {
                     log.error("Customer not found!");
                     return new NotFoundException("Customer not found!");

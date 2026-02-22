@@ -1,6 +1,6 @@
 package org.example.finalproject.service
 
-import spock.lang.Specification
+
 import org.example.finalproject.dto.AddressDto
 import org.example.finalproject.entity.Address
 import org.example.finalproject.entity.Users
@@ -39,7 +39,7 @@ class AddressServiceTest extends Specification {
         def result = addressService.getAddresses()
 
         then: "repositories are called and data is returned"
-        1 * usersRepository.findByEmail("test@example.com") >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse("test@example.com") >> Optional.of(user)
         1 * addressRepository.findByUser(user) >> Optional.of(address)
         1 * addressMapper.toResponseDto(address) >> expectedDto
 
@@ -50,7 +50,7 @@ class AddressServiceTest extends Specification {
 
     def "should throw NotFoundException when user does not exist"() {
         given: "no user found in database"
-        usersRepository.findByEmail(_ as String) >> Optional.empty()
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.empty()
 
         when: "getAddresses is called"
         addressService.getAddresses()
@@ -70,7 +70,7 @@ class AddressServiceTest extends Specification {
         def response = addressService.updateAddress(addressDto)
 
         then: "user is found and address is saved with new values"
-        1 * usersRepository.findByEmail(_) >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse(_) >> Optional.of(user)
         1 * addressRepository.findByUser(user) >> Optional.of(existingAddress)
         1 * addressRepository.save({ Address addr ->
             addr.city == "London" && addr.street == "Baker St" && addr.home == "221B"
@@ -83,7 +83,7 @@ class AddressServiceTest extends Specification {
     def "should throw NotFoundException when address record is missing during update"() {
         given: "a user exists but has no address record"
         def user = new Users(email: "test@example.com")
-        usersRepository.findByEmail(_ as String) >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
         addressRepository.findByUser(user) >> Optional.empty()
 
         when: "updateAddress is called"

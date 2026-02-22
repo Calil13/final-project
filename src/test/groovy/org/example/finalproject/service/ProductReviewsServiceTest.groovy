@@ -76,7 +76,7 @@ class ProductReviewsServiceTest extends Specification {
         def user = new Users(id: 1L, email: "test@mail.com")
         def product = new Products(id: 2L, isAvailable: true)
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productsRepository.findById(2L) >> Optional.of(product)
 
         when:
@@ -91,7 +91,7 @@ class ProductReviewsServiceTest extends Specification {
         def user = new Users(id: 1L)
         def product = new Products(id: 2L, isAvailable: false)
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productsRepository.findById(2L) >> Optional.of(product)
 
         when:
@@ -107,7 +107,7 @@ class ProductReviewsServiceTest extends Specification {
         def review = new ProductReview(id: 5L, comment: "Old")
         review.customer = user
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productReviewRepository.findById(5L) >> Optional.of(review)
 
         when:
@@ -125,7 +125,7 @@ class ProductReviewsServiceTest extends Specification {
         def review = new ProductReview(id: 5L)
         review.customer = otherUser
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productReviewRepository.findById(5L) >> Optional.of(review)
 
         when:
@@ -141,7 +141,7 @@ class ProductReviewsServiceTest extends Specification {
         def review = new ProductReview(id: 10L)
         review.customer = user
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productReviewRepository.findById(10L) >> Optional.of(review)
 
         when:
@@ -159,7 +159,7 @@ class ProductReviewsServiceTest extends Specification {
         def review = new ProductReview(id: 10L)
         review.customer = otherUser
 
-        usersRepository.findByEmail("test@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("test@mail.com") >> Optional.of(user)
         productReviewRepository.findById(10L) >> Optional.of(review)
 
         when:

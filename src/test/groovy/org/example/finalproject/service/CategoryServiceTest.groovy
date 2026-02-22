@@ -84,7 +84,7 @@ class CategoryServiceTest extends Specification {
         def dto = new CategoryCreateDto(name: "New Category")
         def entity = new Category(name: "New Category")
 
-        usersRepository.findByEmail("admin@test.com") >> Optional.of(new Users())
+        usersRepository.findByEmailAndDeletedFalse("admin@test.com") >> Optional.of(new Users())
         categoryMapper.toEntity(dto) >> entity
 
         when:
@@ -101,7 +101,7 @@ class CategoryServiceTest extends Specification {
         def subDto = new CategoryCreateDto(name: "Sub")
         def subEntity = new Category(name: "Sub")
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(new Users())
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(new Users())
         categoryRepository.findById(parentId) >> Optional.of(parentCategory)
         categoryMapper.toEntity(subDto, parentCategory) >> subEntity
 
@@ -119,7 +119,7 @@ class CategoryServiceTest extends Specification {
         def existingCategory = new Category(id: id, name: "Old Name")
         def editDto = new CategoryCreateDto(name: "New Name")
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(new Users())
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(new Users())
         categoryRepository.findById(id) >> Optional.of(existingCategory)
 
         when:
@@ -135,7 +135,7 @@ class CategoryServiceTest extends Specification {
         def id = 5L
         def category = new Category(id: id, name: "To be deleted")
 
-        usersRepository.findByEmail(_ as String) >> Optional.of(new Users())
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(new Users())
         categoryRepository.findById(id) >> Optional.of(category)
 
         when:
@@ -147,7 +147,7 @@ class CategoryServiceTest extends Specification {
 
     def "any method - should throw NotFoundException if current user session is invalid"() {
         given:
-        usersRepository.findByEmail(_ as String) >> Optional.empty()
+        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.empty()
 
         when:
         categoryService.deleteCategory(1L)

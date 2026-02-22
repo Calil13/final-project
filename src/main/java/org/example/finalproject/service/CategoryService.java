@@ -6,7 +6,6 @@ import org.example.finalproject.dto.CategoryCreateDto;
 import org.example.finalproject.dto.CategoryDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.exception.NotFoundException;
-import org.example.finalproject.exception.UnexpectedException;
 import org.example.finalproject.mapper.CategoryMapper;
 import org.example.finalproject.repository.CategoryRepository;
 import org.example.finalproject.repository.UsersRepository;
@@ -60,7 +59,7 @@ public class CategoryService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         log.info("A new category has been created.");
@@ -73,7 +72,7 @@ public class CategoryService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         Category parentCategory = categoryRepository.findById(id)
@@ -95,7 +94,7 @@ public class CategoryService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var category = categoryRepository.findById(id).orElseThrow(() -> {
@@ -116,7 +115,7 @@ public class CategoryService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var category =  categoryRepository.findById(id)

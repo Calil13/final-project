@@ -31,7 +31,7 @@ public class FavoriteService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         Page<Favorites> favorites = favoriteRepository.findByCustomer(customer, pageable);
@@ -44,7 +44,7 @@ public class FavoriteService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var product = productsRepository.findById(productId)
@@ -76,7 +76,7 @@ public class FavoriteService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmail(currentEmail)
+        usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var favorite = favoriteRepository.findById(favoriteId)

@@ -2,12 +2,9 @@ package org.example.finalproject.init;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.example.finalproject.dto.AdminLoginRequestDto;
 import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.UserRole;
-import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.repository.UsersRepository;
-import org.example.finalproject.validation.ValidEmail;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +20,7 @@ public class AdminInitializer {
 
         String adminEmail = "adminadmin1302@gmail.com";
 
-        Users admin = usersRepository.findByEmail(adminEmail)
+        Users admin = usersRepository.findByEmailAndDeletedFalse(adminEmail)
                 .orElseGet(Users::new);
 
         admin.setEmail(adminEmail);

@@ -6,10 +6,7 @@ import org.example.finalproject.dto.PayCardDto;
 import org.example.finalproject.dto.PaymentResponseDto;
 import org.example.finalproject.entity.Address;
 import org.example.finalproject.entity.Payment;
-import org.example.finalproject.entity.Products;
-import org.example.finalproject.entity.Users;
 import org.example.finalproject.enums.*;
-import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.IllegalArgumentException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.repository.*;
@@ -41,7 +38,7 @@ public class PaymentsService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> {
                     log.error("Customer not found!");
                     return new NotFoundException("Customer not found!");
@@ -124,7 +121,7 @@ public class PaymentsService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> {
                     log.error("Customer not found.");
                     return new NotFoundException("Customer not found!");

@@ -42,7 +42,7 @@ class FavoriteServiceTest extends Specification {
         def result = favoriteService.getFavorites(pageable)
 
         then: "verify the flow"
-        1 * usersRepository.findByEmail(email) >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         1 * favoriteRepository.findByCustomer(user, pageable) >> favoritesPage
         2 * favoritesMapper.toDto(_ as Favorites) >> new FavoriteProductsDto()
 
@@ -63,7 +63,7 @@ class FavoriteServiceTest extends Specification {
         favoriteService.addFavorite(productId)
 
         then: "check for existence and throw exception"
-        1 * usersRepository.findByEmail(email) >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         1 * productsRepository.findById(productId) >> Optional.of(product)
         1 * favoriteRepository.existsByCustomerAndProduct(user, product) >> true
 
@@ -83,7 +83,7 @@ class FavoriteServiceTest extends Specification {
         favoriteService.addFavorite(productId)
 
         then: "IllegalStateException is thrown"
-        1 * usersRepository.findByEmail(email) >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         1 * productsRepository.findById(productId) >> Optional.of(product)
         1 * favoriteRepository.existsByCustomerAndProduct(user, product) >> false
 
@@ -103,7 +103,7 @@ class FavoriteServiceTest extends Specification {
         favoriteService.addFavorite(productId)
 
         then: "verify the entity is saved"
-        1 * usersRepository.findByEmail(email) >> Optional.of(user)
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(user)
         1 * productsRepository.findById(productId) >> Optional.of(product)
         1 * favoriteRepository.existsByCustomerAndProduct(user, product) >> false
         1 * favoriteRepository.save({ Favorites fav ->
@@ -123,7 +123,7 @@ class FavoriteServiceTest extends Specification {
         favoriteService.deleteFavorite(favoriteId)
 
         then: "check user and delete from repo"
-        1 * usersRepository.findByEmail(email) >> Optional.of(new Users())
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(new Users())
         1 * favoriteRepository.findById(favoriteId) >> Optional.of(favorite)
         1 * favoriteRepository.delete(favorite)
     }
@@ -138,7 +138,7 @@ class FavoriteServiceTest extends Specification {
         favoriteService.deleteFavorite(favoriteId)
 
         then: "NotFoundException is thrown"
-        1 * usersRepository.findByEmail(email) >> Optional.of(new Users())
+        1 * usersRepository.findByEmailAndDeletedFalse(email) >> Optional.of(new Users())
         1 * favoriteRepository.findById(favoriteId) >> Optional.empty()
 
         thrown(NotFoundException)

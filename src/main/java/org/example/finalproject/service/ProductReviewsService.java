@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.ProductReviewsResponseDto;
 import org.example.finalproject.entity.ProductReview;
-import org.example.finalproject.exception.GlobalExceptionHandler;
 import org.example.finalproject.exception.IllegalStateException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductReviewsMapper;
-import org.example.finalproject.mapper.UsersMapper;
 import org.example.finalproject.repository.ProductReviewRepository;
 import org.example.finalproject.repository.ProductsRepository;
 import org.example.finalproject.repository.UsersRepository;
@@ -16,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 @Slf4j
@@ -48,7 +45,7 @@ public class ProductReviewsService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var product = productsRepository.findById(productId)
@@ -74,7 +71,7 @@ public class ProductReviewsService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var review = productReviewRepository.findById(reviewId)
@@ -98,7 +95,7 @@ public class ProductReviewsService {
                 .getAuthentication()
                 .getName();
 
-        var customer = usersRepository.findByEmail(currentEmail)
+        var customer = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var review = productReviewRepository.findById(reviewId)

@@ -54,7 +54,7 @@ class UsersServiceTest extends Specification {
         def addressDto = Mock(AddressDto)
         def responseDto = Mock(UserResponseDto)
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         addressRepository.findByUser(user) >> Optional.of(address)
         addressMapper.toDto(address) >> addressDto
         usersMapper.toResponseDto(user, addressDto as AddressDto) >> responseDto
@@ -76,7 +76,7 @@ class UsersServiceTest extends Specification {
                 confirmNewPassword: "newPass"
         )
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         passwordEncoder.matches("old", "encodedOld") >> true
         passwordEncoder.matches("newPass", "encodedOld") >> false
         passwordEncoder.encode("newPass") >> "encodedNew"
@@ -95,7 +95,7 @@ class UsersServiceTest extends Specification {
         def user = new Users(password: "encodedOld")
         def dto = new UsersUpdatePasswordRequestDto(currentPassword: "wrong")
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         passwordEncoder.matches("wrong", "encodedOld") >> false
 
         when:
@@ -111,7 +111,7 @@ class UsersServiceTest extends Specification {
 
         def dto = new UserCheckPassword(password: "pass")
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         passwordEncoder.matches("pass", "encoded") >> true
 
         when:
@@ -135,7 +135,7 @@ class UsersServiceTest extends Specification {
                 amount: 100
         )
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         paymentsService.validateCard(_ as String, _ as String, _ as String) >> null
 
         when:
@@ -158,7 +158,7 @@ class UsersServiceTest extends Specification {
                 expireDate: "12/30"
         )
 
-        usersRepository.findByEmail("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
         paymentsService.validateCard(_ as String, _ as String, _ as String) >> "Invalid card"
 
         when:

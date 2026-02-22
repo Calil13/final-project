@@ -79,7 +79,7 @@ class ProductsServiceTest extends Specification {
         def category = new Category(id: 5L, parent: new Category())
         def dto = new ProductCreateDto(categoryId: 5L)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         categoryRepository.findById(5L) >> Optional.of(category)
 
         def product = new Products()
@@ -100,7 +100,7 @@ class ProductsServiceTest extends Specification {
         def category = new Category(id: 5L, parent: null)
         def dto = new ProductCreateDto(categoryId: 5L)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         categoryRepository.findById(5L) >> Optional.of(category)
 
         when:
@@ -117,7 +117,7 @@ class ProductsServiceTest extends Specification {
 
         def category = new Category(id: 3L)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         productRepository.findById(10L) >> Optional.of(product)
         categoryRepository.findById(3L) >> Optional.of(category)
 
@@ -145,7 +145,7 @@ class ProductsServiceTest extends Specification {
         def other = new Users(id: 2L, email: "other@mail.com")
         def product = new Products(id: 10L, owner: other)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         productRepository.findById(10L) >> Optional.of(product)
 
         def dto = new ProductUpdateDto(productId: 10L)
@@ -162,7 +162,7 @@ class ProductsServiceTest extends Specification {
         def owner = new Users(id: 1L, email: "owner@mail.com", userRole: UserRole.OWNER)
         def product = new Products(id: 10L, owner: owner, isAvailable: true)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         productRepository.findById(10L) >> Optional.of(product)
 
         when:
@@ -179,7 +179,7 @@ class ProductsServiceTest extends Specification {
         def other = new Users(id: 2L)
         def product = new Products(id: 10L, owner: other, isAvailable: true)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(user)
         productRepository.findById(10L) >> Optional.of(product)
 
         when:
@@ -194,7 +194,7 @@ class ProductsServiceTest extends Specification {
         def owner = new Users(id: 1L, email: "owner@mail.com", userRole: UserRole.ADMIN)
         def product = new Products(id: 10L, owner: owner, isAvailable: false)
 
-        usersRepository.findByEmail("owner@mail.com") >> Optional.of(owner)
+        usersRepository.findByEmailAndDeletedFalse("owner@mail.com") >> Optional.of(owner)
         productRepository.findById(10L) >> Optional.of(product)
 
         when:

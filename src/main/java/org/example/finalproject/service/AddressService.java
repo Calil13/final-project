@@ -24,7 +24,7 @@ public class AddressService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var address = addressRepository.findByUser(user)
@@ -41,7 +41,7 @@ public class AddressService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmail(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var address = addressRepository.findByUser(user)

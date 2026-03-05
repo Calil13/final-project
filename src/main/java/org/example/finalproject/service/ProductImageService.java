@@ -73,6 +73,7 @@ public class ProductImageService {
             }
         }
 
+        log.info("Image added for product with ID: {}", productId);
         return savedImages.stream()
                 .map(img -> new ProductImageDto(img.getId(), img.getImageUrl()))
                 .collect(Collectors.toList());
@@ -97,7 +98,7 @@ public class ProductImageService {
 
         productImageRepository.delete(image);
 
-        log.info("Image deleted successfully.");
+        log.info("Image deleted successfully. \nID: {}", id);
         return "Image deleted successfully.";
     }
 }

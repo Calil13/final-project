@@ -68,6 +68,7 @@ public class FavoriteService {
                 .product(product)
                 .build();
 
+        log.info("Product added to favorite with ID: {}", productId);
         favoriteRepository.save(favorites);
     }
 
@@ -82,6 +83,7 @@ public class FavoriteService {
         var favorite = favoriteRepository.findById(favoriteId)
                 .orElseThrow(() -> new NotFoundException("Favorite not found!"));
 
+        log.info("Product with id {} has been removed from favorites.", favorite.getProduct().getId());
         favoriteRepository.delete(favorite);
     }
 }

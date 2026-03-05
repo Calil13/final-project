@@ -49,6 +49,11 @@ public class ProductController {
         return productService.getProductsByCategory(id, pageable);
     }
 
+    @GetMapping("/parentCategory/{id}")
+    public Page<ProductResponseDto> getProductsByParentCategory(@PathVariable Long id, @ParameterObject Pageable pageable) {
+        return productService.getProductsByParentCategory(id, pageable);
+    }
+
     @Operation(
             summary = "Get products by owner ID",
             description = "Returns paginated list of products belonging to a specific owner."

@@ -15,5 +15,6 @@ public interface ProductsRepository extends JpaRepository<Products, Long>, JpaSp
 
     Page<Products> findByOwnerId(Long ownerId, Pageable pageable);
     Page<Products> findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Products> findByCategoryParentId(Long parentId, Pageable pageable);
     Optional<Products> findByOwner(Users users);
 }

@@ -8,6 +8,7 @@ import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.enums.UserRole;
+import org.example.finalproject.exception.IllegalArgumentException;
 import org.example.finalproject.exception.ProductInUseException;
 import org.example.finalproject.exception.InvalidCategoryOperationException;
 import org.example.finalproject.exception.NotFoundException;
@@ -56,11 +57,40 @@ public class ProductsService {
     }
 
     public Page<ProductResponseDto> getProductsByCategory(Long categoryId, Pageable pageable) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (category.getParent() == null) {
+            log.warn("Parent category id {} was sent to subcategory endpoint", categoryId);
+            throw new IllegalArgumentException("This category is a parent category");
+        }
+
         return productRepository.findByCategoryId(categoryId, pageable)
                 .map(productsMapper::toDto);
     }
 
+    public Page<ProductResponseDto> getProductsByParentCategory(Long parentId, Pageable pageable) {
+        Category category = categoryRepository.findById(parentId)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (category.getParent() != null) {
+            log.warn("Subcategory id {} was sent to parent category endpoint", parentId);
+            throw new IllegalArgumentException("This category is a subcategory");
+        }
+
+        return productRepository.findByCategoryParentId(parentId, pageable)
+                .map(productsMapper::toDto);
+    }
+
     public Page<ProductResponseDto> getOwnerProducts(Long ownerId, Pageable pageable) {
+
+        var user = usersRepository.findById(ownerId)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        if (!user.getUserRole().equals(UserRole.OWNER)) {
+            log.error("User is not owner. \nUserId: {}", ownerId);
+            throw new NotFoundException("Customer does not have products.");
+        }
 
         Page<Products> products = productRepository.findByOwnerId(ownerId, pageable);
 
@@ -94,6 +124,7 @@ public class ProductsService {
 
         productRepository.save(products);
 
+        log.info("New product added. \nOwnerID: {}", owner.getId());
         return productsMapper.toDtoCreate(products);
     }
 
@@ -107,7 +138,7 @@ public class ProductsService {
 
         var product = productRepository.findById(requestDto.getProductId())
                 .orElseThrow(() -> {
-                    log.error("Product not found!");
+                    log.error("Product not found with ID: {}", requestDto.getProductId());
                     return new NotFoundException("Product not found!");
                 });
 
@@ -139,6 +170,7 @@ public class ProductsService {
 
         productRepository.save(product);
 
+        log.info("Product edited with ID: {}", product.getId());
         return productsMapper.toDtoUpdate(product);
     }
 

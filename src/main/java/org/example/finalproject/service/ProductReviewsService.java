@@ -49,7 +49,7 @@ public class ProductReviewsService {
                 .orElseThrow(() -> new NotFoundException("Customer not found!"));
 
         var product = productsRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Customer not found!"));
+                .orElseThrow(() -> new NotFoundException("Product not found!"));
 
         if (product.getIsAvailable().equals(false)) {
             log.error("A review cannot be added to an inactive product.");
@@ -87,6 +87,8 @@ public class ProductReviewsService {
         }
 
         review.setComment(editedComment);
+
+        log.info("Review edited for ID: {}", reviewId);
         productReviewRepository.save(review);
     }
 

@@ -20,12 +20,20 @@ public class OrdersController {
 
     private final OrdersService ordersService;
 
+    @Operation(
+            summary = "Get delivery information",
+            description = "Fetches the customer's current address and contact details for review or modification during checkout."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/delivery-info")
     public OrderInfoResponseDto getDeliveryInfo() {
         return ordersService.getDeliveryInfo();
     }
 
+    @Operation(
+            summary = "Place a new order",
+            description = "Creates a new order based on the specified delivery type and order details."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("{deliveryType}")
     public String createOrder(@Valid @PathVariable DeliveryType deliveryType, @RequestBody OrdersDto ordersDto) {
@@ -36,11 +44,14 @@ public class OrdersController {
             summary = "Confirm order received"
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/delivered/{orderId}")
+    @PatchMapping("/received/{orderId}")
     public void received(@PathVariable Long orderId) {
         ordersService.received(orderId);
     }
 
+    @Operation(
+            summary = "Return a rental order"
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("return/{orderId}")
     public ResponseEntity<String> returnRental(@PathVariable Long orderId) {

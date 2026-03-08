@@ -47,7 +47,7 @@ public class OrdersService {
 
         AddressDto addressDto = addressMapper.toDto(address);
 
-
+        log.info("Deliver info returned by Customer. \nUser ID: {}", user.getId());
         return new OrderInfoResponseDto(user.getPhone(), addressDto);
     }
 
@@ -83,6 +83,7 @@ public class OrdersService {
 
         ordersRepository.save(order);
 
+        log.info("Order created by Customer \nUser ID: {}", user.getId());
         return "Your total amount : " + totalAmount + " AZN";
     }
 
@@ -91,7 +92,7 @@ public class OrdersService {
                 .getAuthentication()
                 .getName();
 
-        usersRepository.findByEmailAndDeletedFalse(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         var order = ordersRepository.findById(orderId)
@@ -110,6 +111,8 @@ public class OrdersService {
         }
 
         order.setOrderStatus(OrderStatus.DELIVERED);
+
+        log.info("Product received to customer. \nUser ID: {}", user.getId());
         ordersRepository.save(order);
     }
 
@@ -138,7 +141,7 @@ public class OrdersService {
         order.setOrderStatus(OrderStatus.RETURNED);
         ordersRepository.save(order);
 
-        log.info("The product has been returned.");
+        log.info("Product has been returned. \nProduct ID: {}", product.getId());
         return ResponseEntity.ok("The product has been returned.");
     }
 
@@ -161,7 +164,7 @@ public class OrdersService {
         productsRepository.save(product);
         ordersRepository.delete(order);
 
-        log.info("The order has been cancelled.");
+        log.info("Order has been cancelled. \nProduct ID: {}", productId);
         return "The order has been cancelled.";
     }
 }

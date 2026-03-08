@@ -165,7 +165,7 @@ public class PaymentsService {
                     + address.getStreet() + ", \n"
                     + address.getHome();
 
-            return new PaymentResponseDto("Cash payment will be collected on delivery." + " - Owner address :" + pickupAddress);
+            return new PaymentResponseDto("Payment on pickup." + " - Owner address :" + pickupAddress);
         }
 
         return new PaymentResponseDto(

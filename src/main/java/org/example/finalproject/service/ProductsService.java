@@ -34,7 +34,7 @@ public class ProductsService {
     private final AddressRepository addressRepository;
 
     public Page<ProductResponseDto> getProducts(Pageable pageable) {
-        Page<Products> productsPage = productRepository.findAll(pageable);
+        Page<Products> productsPage = productRepository.findByIsAvailableTrue(pageable);
         return productsPage.map(productsMapper::toDto);
     }
 

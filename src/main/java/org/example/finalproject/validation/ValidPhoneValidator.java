@@ -10,9 +10,13 @@ public class ValidPhoneValidator implements ConstraintValidator<ValidPhone, Stri
 
     @Override
     public boolean isValid(String phone, ConstraintValidatorContext context) {
+
         if (phone == null || phone.isBlank()) {
             return false;
         }
-        return phone.matches(PHONE_REGEX);
+
+        String normalizedPhone = phone.replace("-", "");
+
+        return normalizedPhone.matches(PHONE_REGEX);
     }
 }

@@ -8,10 +8,8 @@ import org.example.finalproject.dto.ProductResponseDto;
 import org.example.finalproject.entity.Category;
 import org.example.finalproject.entity.Products;
 import org.example.finalproject.enums.UserRole;
+import org.example.finalproject.exception.*;
 import org.example.finalproject.exception.IllegalArgumentException;
-import org.example.finalproject.exception.ProductInUseException;
-import org.example.finalproject.exception.InvalidCategoryOperationException;
-import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.mapper.ProductsMapper;
 import org.example.finalproject.repository.AddressRepository;
 import org.example.finalproject.repository.CategoryRepository;
@@ -89,7 +87,7 @@ public class ProductsService {
 
         if (!user.getUserRole().equals(UserRole.OWNER)) {
             log.error("User is not owner. \nUserId: {}", ownerId);
-            throw new NotFoundException("Customer does not have products.");
+            throw new AccessDeniedException("Customer is not owner.");
         }
 
         Page<Products> products = productRepository.findByOwnerId(ownerId, pageable);
@@ -143,7 +141,7 @@ public class ProductsService {
                 });
 
         if(!product.getOwner().getEmail().equals(currentEmail)) {
-            throw new ProductInUseException("You can only edit your own products.");
+            throw new AccessDeniedException("You can only edit your own products.");
         }
 
         var category = categoryRepository.findById(requestDto.getCategoryId())
@@ -188,7 +186,7 @@ public class ProductsService {
         if (
                 user.getUserRole() != UserRole.ADMIN &&
                 !product.getOwner().getId().equals(user.getId())) {
-            throw new ProductInUseException("You are not allowed to delete this product!");
+            throw new AccessDeniedException("You are not allowed to delete this product!");
         }
 
         if(product.getIsAvailable() == false) {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.AddressDto;
 import org.example.finalproject.dto.OrderInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
+import org.example.finalproject.dto.UserOrdersDto;
 import org.example.finalproject.entity.Orders;
 import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.enums.OrderStatus;
@@ -14,7 +15,10 @@ import org.example.finalproject.exception.AlreadyExistsException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.ProductNotAvailableException;
 import org.example.finalproject.mapper.AddressMapper;
+import org.example.finalproject.mapper.OrdersMapper;
 import org.example.finalproject.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,11 +32,26 @@ import java.time.LocalDateTime;
 public class OrdersService {
 
     private final OrdersRepository ordersRepository;
+    private final OrdersMapper ordersMapper;
     private final UsersRepository usersRepository;
     private final ProductsRepository productsRepository;
     private final AddressMapper addressMapper;
     private final AddressRepository addressRepository;
     private final PaymentRepository paymentRepository;
+
+    public Page<UserOrdersDto> getOrders(Pageable pageable) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
+                .orElseThrow(() -> new NotFoundException("User not found!"));
+
+        var orders = ordersRepository.findByCustomer(user, pageable);
+
+        log.info("Orders returned for customer with ID: {}", user.getId());
+        return orders.map(ordersMapper::toDto);
+    }
 
     public OrderInfoResponseDto getDeliveryInfo() {
         String currentEmail = SecurityContextHolder.getContext()

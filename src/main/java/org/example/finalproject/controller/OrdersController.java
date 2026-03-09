@@ -7,8 +7,12 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.finalproject.dto.OrderInfoResponseDto;
 import org.example.finalproject.dto.OrdersDto;
+import org.example.finalproject.dto.UserOrdersDto;
 import org.example.finalproject.enums.DeliveryType;
 import org.example.finalproject.service.OrdersService;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,12 @@ import org.springframework.web.bind.annotation.*;
 public class OrdersController {
 
     private final OrdersService ordersService;
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping
+    public Page<UserOrdersDto> getOrders(@ParameterObject Pageable pageable) {
+        return ordersService.getOrders(pageable);
+    }
 
     @Operation(
             summary = "Get delivery information",

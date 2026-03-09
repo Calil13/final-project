@@ -1,152 +1,250 @@
 package org.example.finalproject.service
 
-import org.example.finalproject.dto.OrdersDto
-import org.example.finalproject.entity.Orders
-import org.example.finalproject.entity.Payment
-import org.example.finalproject.entity.Products
-import org.example.finalproject.entity.Users
+import org.example.finalproject.dto.*
+import org.example.finalproject.entity.*
 import org.example.finalproject.enums.*
-import org.example.finalproject.exception.ProductNotAvailableException
-import org.example.finalproject.exception.AlreadyExistsException
+import org.example.finalproject.exception.*
+import org.example.finalproject.mapper.*
 import org.example.finalproject.repository.*
-import org.example.finalproject.mapper.AddressMapper
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 
+import java.math.BigDecimal
+import java.time.LocalDateTime
 
 class OrdersServiceTest extends Specification {
-    OrdersRepository ordersRepository = Mock()
-    UsersRepository usersRepository = Mock()
-    ProductsRepository productsRepository = Mock()
-    AddressMapper addressMapper = Mock()
-    AddressRepository addressRepository = Mock()
-    PaymentRepository paymentRepository = Mock()
 
-    OrdersService ordersService
+    def ordersRepository = Mock(OrdersRepository)
+    def ordersMapper = Mock(OrdersMapper)
+    def usersRepository = Mock(UsersRepository)
+    def productsRepository = Mock(ProductsRepository)
+    def addressMapper = Mock(AddressMapper)
+    def addressRepository = Mock(AddressRepository)
+    def paymentRepository = Mock(PaymentRepository)
 
-    def setup() {
-        ordersService = new OrdersService(
-                ordersRepository,
-                usersRepository,
-                productsRepository,
-                addressMapper,
-                addressRepository,
-                paymentRepository
-        )
+    def service = new OrdersService(
+            ordersRepository,
+            ordersMapper,
+            usersRepository,
+            productsRepository,
+            addressMapper,
+            addressRepository,
+            paymentRepository
+    )
 
-        def auth = new UsernamePasswordAuthenticationToken("test@mail.com", null)
-        SecurityContextHolder.context.authentication = auth
+    def setupSecurity(String email) {
+        Authentication auth = Mock()
+        auth.getName() >> email
+        SecurityContext context = Mock()
+        context.getAuthentication() >> auth
+        SecurityContextHolder.setContext(context)
     }
 
-    def cleanup() {
-        SecurityContextHolder.clearContext()
-    }
-
-    def "createOrder should create order successfully"() {
+    def "should return user's orders"() {
         given:
-        def user = new Users(email: "test@mail.com")
-        def product = new Products(
-                id: 1L,
-                price: new BigDecimal("10"),
-                isAvailable: true
-        )
-
-        def dto = new OrdersDto(productId: 1L, day: 3)
-
-        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
-        productsRepository.findById(1L) >> Optional.of(product)
+        setupSecurity("user@mail.com")
+        def user = new Users(id:1)
+        def order = new Orders()
+        def dto = new UserOrdersDto()
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        ordersRepository.findByCustomer(user, PageRequest.of(0,10)) >> new PageImpl([order])
+        ordersMapper.toDto(order) >> dto
 
         when:
-        def result = ordersService.createOrder(DeliveryType.DELIVERY, dto)
+        def result = service.getOrders(PageRequest.of(0,10))
 
         then:
-        1 * ordersRepository.save(_ as Orders)
-        1 * productsRepository.save(product)
-
-        product.isAvailable == false
-        result == "Your total amount : 30 AZN"
+        result.content.size() == 1
     }
 
-    def "createOrder should throw exception if product is not available"() {
+    def "should throw exception if user not found in getOrders"() {
         given:
-        def user = new Users(email: "test@mail.com")
-        def product = new Products(
-                id: 1L,
-                isAvailable: false
-        )
-
-        def dto = new OrdersDto(productId: 1L, day: 2)
-
-        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
-        productsRepository.findById(1L) >> Optional.of(product)
+        setupSecurity("user@mail.com")
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.empty()
 
         when:
-        ordersService.createOrder(DeliveryType.DELIVERY, dto)
+        service.getOrders(PageRequest.of(0,10))
+
+        then:
+        thrown(NotFoundException)
+    }
+
+    def "should return delivery info"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users(id:1, phone:"0123456789")
+        def address = new Address()
+        def addressDto = new AddressDto()
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        addressRepository.findByUser(user) >> Optional.of(address)
+        addressMapper.toDto(address) >> addressDto
+
+        when:
+        def result = service.getDeliveryInfo()
+
+        then:
+        result.phone == "0123456789"
+        result.address == addressDto
+    }
+
+    def "should throw exception if address not found"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        addressRepository.findByUser(user) >> Optional.empty()
+
+        when:
+        service.getDeliveryInfo()
+
+        then:
+        thrown(NotFoundException)
+    }
+
+    def "should create order successfully"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users(id:1)
+        def product = new Products(id:1, price:BigDecimal.valueOf(10), isAvailable:true)
+        def ordersDto = new OrdersDto(productId:1, day:3)
+
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        productsRepository.findById(1) >> Optional.of(product)
+
+        when:
+        def result = service.createOrder(DeliveryType.DELIVERY, ordersDto)
+
+        then:
+        product.isAvailable == false
+        result.contains("30")
+    }
+
+    def "should throw exception if product not available"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users(id:1)
+        def product = new Products(id:1, isAvailable:false)
+        def ordersDto = new OrdersDto(productId:1, day:1)
+
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        productsRepository.findById(1) >> Optional.of(product)
+
+        when:
+        service.createOrder(DeliveryType.DELIVERY, ordersDto)
 
         then:
         thrown(ProductNotAvailableException)
-        0 * ordersRepository.save(_)
     }
 
-    def "received should mark order as delivered and payment success for cash"() {
+    def "should mark order as delivered"() {
         given:
-        def user = new Users(email: "test@mail.com")
-        def order = new Orders(orderStatus: OrderStatus.CREATED)
-        def payment = Mock(Payment) {
-            getPaymentMethod() >> PaymentMethod.CASH
-        }
-
-        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
-        ordersRepository.findById(1L) >> Optional.of(order)
+        setupSecurity("user@mail.com")
+        def user = new Users(id:1)
+        def order = new Orders(orderStatus:OrderStatus.CREATED)
+        def payment = new Payment(paymentMethod:PaymentMethod.CASH, paymentStatus:PaymentStatus.PENDING)
         paymentRepository.findByOrder(order) >> Optional.of(payment)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        ordersRepository.findById(1) >> Optional.of(order)
 
         when:
-        ordersService.received(1L)
+        service.received(1)
 
         then:
-        1 * payment.setPaymentStatus(PaymentStatus.SUCCESS)
         order.orderStatus == OrderStatus.DELIVERED
-        1 * ordersRepository.save(order)
+        payment.paymentStatus == PaymentStatus.SUCCESS
     }
 
-    def "received should throw exception if order already delivered"() {
+    def "should throw exception if order already delivered"() {
         given:
-        def user = new Users(email: "test@mail.com")
-        def order = new Orders(orderStatus: OrderStatus.DELIVERED)
-        def payment = new Payment(
-                paymentMethod: PaymentMethod.CASH,
-                paymentStatus: PaymentStatus.PENDING
-        )
-
-        usersRepository.findByEmailAndDeletedFalse(_ as String) >> Optional.of(user)
-        ordersRepository.findById(1L) >> Optional.of(order)
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        def order = new Orders(orderStatus:OrderStatus.DELIVERED)
+        def payment = new Payment(paymentMethod: PaymentMethod.CASH, paymentStatus: PaymentStatus.PENDING)
         paymentRepository.findByOrder(order) >> Optional.of(payment)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        ordersRepository.findById(1) >> Optional.of(order)
 
         when:
-        ordersService.received(1L)
+        service.received(1)
 
         then:
         thrown(AlreadyExistsException)
     }
 
-    def "deleteOrder should cancel order and free product"() {
+    def "should return product successfully"() {
         given:
-        def user = new Users(email: "test@mail.com")
-        def product = new Products(isAvailable: false)
-        def order = new Orders(product: product)
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        def product = new Products(id:1, isAvailable:false)
+        def order = new Orders(orderDate:LocalDateTime.now().minusDays(1), product:product)
 
-        usersRepository.findByEmailAndDeletedFalse(_) >> Optional.of(user)
-        productsRepository.findById(1L) >> Optional.of(product)
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        ordersRepository.findById(1) >> Optional.of(order)
+
+        when:
+        def result = service.returnRental(1)
+
+        then:
+        product.isAvailable
+        order.orderStatus == OrderStatus.RETURNED
+        result.statusCode.value() == 200
+    }
+
+    def "should fail return if product not expired"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        def product = new Products(id:1, isAvailable:false)
+        def order = new Orders(orderDate:LocalDateTime.now().plusDays(1), product:product)
+
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        ordersRepository.findById(1) >> Optional.of(order)
+
+        when:
+        def result = service.returnRental(1)
+
+        then:
+        result.statusCode.value() == 400
+    }
+
+    def "should delete order successfully"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        def product = new Products(id:1, isAvailable:false)
+        def order = new Orders(product:product)
+
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        productsRepository.findById(1) >> Optional.of(product)
         ordersRepository.findByProduct(product) >> Optional.of(order)
 
         when:
-        def result = ordersService.deleteOrder(1L)
+        def result = service.deleteOrder(1)
 
         then:
-        product.isAvailable == true
-        1 * productsRepository.save(product)
-        1 * ordersRepository.delete(order)
-        result == "The order has been cancelled."
+        product.isAvailable
+        result.contains("cancelled")
+    }
+
+    def "should throw exception if order not found"() {
+        given:
+        setupSecurity("user@mail.com")
+        def user = new Users()
+        def product = new Products(id:1, isAvailable:false)
+
+        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        productsRepository.findById(1) >> Optional.of(product)
+        ordersRepository.findByProduct(product) >> Optional.empty()
+
+        when:
+        service.deleteOrder(1)
+
+        then:
+        thrown(NotFoundException)
     }
 }

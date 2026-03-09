@@ -125,12 +125,13 @@ public class AuthService {
                     return new NotFoundException("Email not found!");
                 });
 
+        log.info("OTP sent to {} for password reset request", sentOpt.getEmail());
         return otpService.sendOtp(sentOpt.getEmail());
     }
 
     public String verifyEmail(EmailVerifyOtpDto verifyOtp) {
         otpService.verifyOtp(verifyOtp.getEmail(), verifyOtp.getOtp());
-        log.info("OTP verified!");
+        log.info("OTP verified for customer. \nCustomer email: {}", verifyOtp.getEmail());
         return "OTP verified.";
     }
 
@@ -159,7 +160,7 @@ public class AuthService {
 
         otpService.removeOtp(user.getEmail());
 
-        log.info("Password updated successfully.");
+        log.info("Password updated successfully. \nCustomer ID: {}", user.getId());
         return "Password updated successfully.";
     }
 
@@ -193,7 +194,7 @@ public class AuthService {
         user.setIsActive(true);
         refreshTokenRepository.save(refreshToken);
 
-        log.info("User login.");
+        log.info("User login. \nnUser ID: {}", user.getId());
         return new AuthResponseDto(accessToken, refreshTokenStr);
     }
 
@@ -241,6 +242,7 @@ public class AuthService {
         refreshTokenRepository.deleteByToken(token.getToken());
         user.setIsActive(false);
 
+        log.info("User logged. \nUser ID: {}", user.getId());
         return "Logged out successfully!";
     }
 }

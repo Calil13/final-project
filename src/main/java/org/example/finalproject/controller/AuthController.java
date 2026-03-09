@@ -51,16 +51,19 @@ public class AuthController {
         return authService.refreshToken(request);
     }
 
+    @Operation(summary = "Send OTP to user email for password reset")
     @PostMapping("/password/forgot")
     public String forgotPassword(@Valid @RequestBody EmailSentOtpDto sentOtp) {
         return authService.forgotPassword(sentOtp);
     }
 
+    @Operation(summary = "Verify OTP sent to user email")
     @PostMapping("/password/verify")
     public String verifyEmail(@Valid @RequestBody EmailVerifyOtpDto verifyOtp) {
         return authService.verifyEmail(verifyOtp);
     }
 
+    @Operation(summary = "Reset user password after OTP verification")
     @PostMapping("/password/reset")
     public String resetPassword(@Valid @RequestBody UsersForgetPasswordDto forgetPassword) {
         return authService.resetPassword(forgetPassword);

@@ -64,7 +64,7 @@ public class OrdersController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("return/{orderId}")
-    public ResponseEntity<String> returnRental(@PathVariable Long orderId) {
+    public String returnRental(@PathVariable Long orderId) {
         return ordersService.returnRental(orderId);
     }
 

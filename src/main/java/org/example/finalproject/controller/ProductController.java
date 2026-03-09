@@ -49,7 +49,7 @@ public class ProductController {
         return productService.getProductsByCategory(id, pageable);
     }
 
-    @GetMapping("/parentCategory/{id}")
+    @GetMapping("/parent-category/{id}")
     public Page<ProductResponseDto> getProductsByParentCategory(@PathVariable Long id, @ParameterObject Pageable pageable) {
         return productService.getProductsByParentCategory(id, pageable);
     }

@@ -25,7 +25,7 @@ public class AddressController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/updateAddress")
+    @PatchMapping("/update-address")
     public String updateAddress(AddressDto addressDto) {
         return addressService.updateAddress(addressDto);
     }

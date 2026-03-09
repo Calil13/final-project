@@ -29,14 +29,14 @@ public class UsersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/updateFullName")
+    @PatchMapping("/update-fullName")
     public UsersUpdateFullNameRequestDto updateFullNameRequest(@RequestBody UsersUpdateFullNameRequestDto update, Authentication authentication) {
         String email = authentication.getName();
         return usersService.updateFullNameRequest(update, email);
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/updatePhone")
+    @PatchMapping("/update-phone")
     public String updatePhone(@Valid @RequestBody UsersUpdatePhoneDto updatePhone) {
         return usersService.updatePhone(updatePhone);
     }
@@ -55,7 +55,7 @@ public class UsersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PatchMapping("/newPassword")
+    @PatchMapping("/new-password")
     public String updatePassword(@Valid @RequestBody UsersUpdatePasswordRequestDto updatePassword) {
         return usersService.updatePassword(updatePassword);
     }
@@ -67,7 +67,7 @@ public class UsersController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("/becomeOwner")
+    @PostMapping("/become-owner")
     public String becomeOwner(@Valid @RequestBody OwnerRequestDto ownerRequestDTO) {
         return usersService.becomeOwner(ownerRequestDTO);
     }

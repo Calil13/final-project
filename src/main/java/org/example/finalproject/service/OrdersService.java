@@ -135,7 +135,7 @@ public class OrdersService {
         ordersRepository.save(order);
     }
 
-    public ResponseEntity<String> returnRental(Long orderId) {
+    public String returnRental(Long orderId) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -150,8 +150,7 @@ public class OrdersService {
 
         if (LocalDateTime.now().isBefore(order.getOrderDate())) {
             log.error("The product has not expired yet.");
-            return ResponseEntity.badRequest()
-                    .body("The product has not expired yet.");
+            return "The product has not expired yet.";
         }
 
         product.setIsAvailable(true);
@@ -161,7 +160,7 @@ public class OrdersService {
         ordersRepository.save(order);
 
         log.info("Product has been returned. \nProduct ID: {}", product.getId());
-        return ResponseEntity.ok("The product has been returned.");
+        return "The product has been returned.";
     }
 
     public String deleteOrder(Long productId) {

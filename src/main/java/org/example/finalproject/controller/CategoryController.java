@@ -29,21 +29,21 @@ public class CategoryController {
         return categoryService.getCategoryById(categoryId);
     }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @PostMapping
     @Operation(
             summary = "Create new category",
             description = "Creates a new parent category."
     )
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping
     public void createCategory(@RequestBody CategoryCreateDto createDto) {
         categoryService.createCategory(createDto);
     }
 
-    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Add subcategory",
             description = "Creates a subcategory under the given parent category ID"
     )
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/{parentId}/sub")
     public void addSubcategory(@PathVariable Long parentId, @RequestBody CategoryCreateDto subCategory) {
         categoryService.addSubcategory(parentId, subCategory);

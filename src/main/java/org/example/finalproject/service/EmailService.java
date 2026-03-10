@@ -14,15 +14,16 @@ public class EmailService {
     public void sendOtpEmail(String to, String otpCode) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your OTP Code");
+        message.setSubject("OTP");
         message.setText("Your OTP code is: " + otpCode);
 
         mailSender.send(message);
     }
 
     public void sendEmail(String to, String subject, String body) {
-
         SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setFrom("Rental e-commerce Team");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);

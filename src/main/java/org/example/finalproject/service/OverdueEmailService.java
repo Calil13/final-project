@@ -28,10 +28,6 @@ public class OverdueEmailService {
 
         for (Orders order : orders) {
 
-            if (order.getOrderStatus() == OrderStatus.CANCELLED) {
-                continue;
-            }
-
             LocalDateTime endDate =
                     order.getOrderDate().plusDays(order.getDay());
 
@@ -46,7 +42,7 @@ public class OverdueEmailService {
                         "Sifariş №" + order.getId() + " üçün kirayə müddəti başa çatmışdır.\n" +
                         "Zəhmət olmasa məhsulu ən qısa zamanda geri qaytarın.\n\n" +
                         "Əks halda balansınızdan əlavə ödəniş tutulacaqdır.\n\n" +
-                        "Hörmətlə,\nFinal Project Team";
+                        "Hörmətlə,\nRental e-commerce Team";
 
                 emailService.sendEmail(user.getEmail(), subject, body);
 

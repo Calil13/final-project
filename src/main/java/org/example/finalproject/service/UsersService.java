@@ -94,6 +94,7 @@ public class UsersService {
 
         usersRepository.save(user);
 
+        log.info("User's full name updated successfully. \nUser ID: {}", user.getId());
         return usersMapper.toFullNameDto(user);
     }
 
@@ -108,19 +109,19 @@ public class UsersService {
         user.setPhone("+994" + updatePhone.getNewPhone());
         usersRepository.save(user);
 
-        log.info("User's phone updated successfully.");
+        log.info("User's phone updated successfully. \nUser ID: {}", user.getId());
         return "Phone updated successfully.";
     }
 
     public String newEmailRequest(EmailSentOtpDto request, String email) {
-        var users = usersRepository.findByEmailAndDeletedFalse(email)
+        var user = usersRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> {
                     log.error("Email not found!");
                     return new NotFoundException("Email not found!");
                 });
 
 
-        if (users.getEmail().equals(request.getEmail())) {
+        if (user.getEmail().equals(request.getEmail())) {
             throw new BadRequestException("New email cannot be the same as current email");
         }
 
@@ -130,6 +131,7 @@ public class UsersService {
 
         otpService.sendOtp(request.getEmail());
 
+        log.info("Sends OTP to the new email address for verification. \nUser ID: {}", user.getId());
         return "OTP sent successfully!";
     }
 
@@ -149,7 +151,7 @@ public class UsersService {
 
         otpService.removeOtp(verify.getEmail());
 
-        log.info("User's email updated successfully.");
+        log.info("User's email updated successfully. \nUser ID: {}", user.getId());
         return "Email updated successfully.";
     }
 
@@ -163,21 +165,25 @@ public class UsersService {
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         if (!passwordEncoder.matches(updatePassword.getCurrentPassword(), user.getPassword())) {
+            log.warn("Password update failed: existing password is incorrect. User email: {}", user.getEmail());
             throw new WrongPasswordException("Existing Password is wrong!");
         }
 
         if (!updatePassword.getNewPassword().equals(updatePassword.getConfirmNewPassword())) {
+            log.warn("Password update failed: new password and confirm password do not match. User email: {}", user.getEmail());
             throw new WrongPasswordException("Confirm new password correctly!");
         }
 
         if (passwordEncoder.matches(updatePassword.getNewPassword(), user.getPassword())) {
+            log.warn("Password update failed: new password is the same as the current password. User email: {}", user.getEmail());
             throw new WrongPasswordException("New password cannot be same as the existing password!");
         }
 
         user.setPassword(passwordEncoder.encode(updatePassword.getNewPassword()));
         usersRepository.save(user);
 
-        return "Password changed successfully!";
+        log.info("User's password updated successfully. \nUser ID: {}", user.getId());
+        return "Password changed successfully.";
     }
 
     public String deleteAccount(UserCheckPassword checkPassword) {

@@ -194,7 +194,7 @@ public class AuthService {
         user.setIsActive(true);
         refreshTokenRepository.save(refreshToken);
 
-        log.info("User login. \nnUser ID: {}", user.getId());
+        log.info("User login. \nUser ID: {}", user.getId());
         return new AuthResponseDto(accessToken, refreshTokenStr);
     }
 

@@ -1,5 +1,6 @@
 package org.example.finalproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,6 +42,10 @@ public class UsersController {
         return usersService.updatePhone(updatePhone);
     }
 
+    @Operation(
+            summary = "Request email change",
+            description = "Sends OTP to the new email address for verification."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/newEmail/change-request")
     public String newEmailRequest(@Valid @RequestBody EmailSentOtpDto request, Authentication authentication) {
@@ -48,6 +53,10 @@ public class UsersController {
         return usersService.newEmailRequest(request, email);
     }
 
+    @Operation(
+            summary = "Verify OTP and change email",
+            description = "Verifies OTP sent to new email and updates user's email address."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/newEmail/verify")
     public String newEmailVerifyOtp(@Valid @RequestBody EmailVerifyOtpDto verifyOtp) {

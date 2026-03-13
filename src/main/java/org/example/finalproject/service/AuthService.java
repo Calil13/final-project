@@ -51,6 +51,7 @@ public class AuthService {
         return "OTP verified.";
     }
 
+    @Transactional
     public String finishRegistration(RegisterFinishDto finish) {
 
         if (!otpService.isVerified(finish.getEmail())) {

@@ -1,6 +1,7 @@
 package org.example.finalproject.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -16,12 +17,15 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false, length = 100)
     private String city;
 
+    @NotBlank
     @Column(nullable = false, length = 150)
     private String street;
 
+    @NotBlank
     @Column(nullable = false, length = 50)
     private String home;
 

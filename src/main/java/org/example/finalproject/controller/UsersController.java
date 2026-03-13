@@ -75,6 +75,10 @@ public class UsersController {
         return usersService.deleteAccount(checkPassword);
     }
 
+    @Operation(
+            summary = "Become owner",
+            description = "Changes the user role from customer to owner."
+    )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/become-owner")
     public String becomeOwner(@Valid @RequestBody OwnerRequestDto ownerRequestDTO) {

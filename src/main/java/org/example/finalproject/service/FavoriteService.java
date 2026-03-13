@@ -36,6 +36,7 @@ public class FavoriteService {
 
         Page<Favorites> favorites = favoriteRepository.findByCustomer(customer, pageable);
 
+        log.info("Customer ID={} favorite products returned.", customer.getId());
         return favorites.map(favoritesMapper::toDto);
     }
 

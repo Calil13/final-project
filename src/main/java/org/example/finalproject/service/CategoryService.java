@@ -67,7 +67,7 @@ public class CategoryService {
         categoryRepository.save(categoryMapper.toEntity(createDto));
     }
 
-    public void addSubcategory(Long id, CategoryCreateDto subCategory) {
+    public void addSubcategory(Long parentId, CategoryCreateDto subCategory) {
         String currentEmail = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
@@ -75,7 +75,7 @@ public class CategoryService {
         usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
-        Category parentCategory = categoryRepository.findById(id)
+        Category parentCategory = categoryRepository.findById(parentId)
                 .orElseThrow(() -> {
                     log.error("Parent category not found!");
                     return new  NotFoundException("Parent category not found!");
@@ -85,6 +85,7 @@ public class CategoryService {
 
         parentCategory.getSubCategories().add(newSubCategory);
 
+        log.info("Sub category added for parent category: \nParent Category ID: {}", parentId);
         categoryRepository.save(parentCategory);
     }
 
@@ -102,10 +103,9 @@ public class CategoryService {
             return new NotFoundException("Category not found!");
         });
 
-        category.setName(editedDto.getName());
-
         log.info("Category edited. \nId: {}\nOld Name: {}\nNew Name: {}", id, category.getName(), editedDto.getName());
 
+        category.setName(editedDto.getName());
         categoryRepository.save(category);
     }
 

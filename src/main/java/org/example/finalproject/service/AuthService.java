@@ -132,7 +132,7 @@ public class AuthService {
 
     public String verifyEmail(EmailVerifyOtpDto verifyOtp) {
         otpService.verifyOtp(verifyOtp.getEmail(), verifyOtp.getOtp());
-        log.info("OTP verified for customer. \nCustomer email: {}", verifyOtp.getEmail());
+        log.info("OTP verified for user. \nUser email: {}", verifyOtp.getEmail());
         return "OTP verified.";
     }
 
@@ -161,7 +161,7 @@ public class AuthService {
 
         otpService.removeOtp(user.getEmail());
 
-        log.info("Password updated successfully. \nCustomer ID: {}", user.getId());
+        log.info("Password updated successfully. \nUser ID: {}", user.getId());
         return "Password updated successfully.";
     }
 

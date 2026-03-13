@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/payments/pay/").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
                         .requestMatchers("/orders/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_ADMIN")
                         .requestMatchers("/address/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_ADMIN")
-                        .requestMatchers("/favorites/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_OWNER")
+                        .requestMatchers("/favorites/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
                         .requestMatchers(HttpMethod.GET, "/user/public/**").permitAll()
                         .requestMatchers("/user/**").authenticated()
                         .anyRequest().authenticated()

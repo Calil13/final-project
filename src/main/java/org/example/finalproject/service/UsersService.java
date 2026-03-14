@@ -40,7 +40,7 @@ public class UsersService {
                 .getAuthentication()
                 .getName();
 
-        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
+        var user = usersRepository.findByEmailAndDeletedFalseAndIsActiveTrue(currentEmail)
                 .orElseThrow(() -> {
                     log.error("User not found.");
                     return new NotFoundException("User not found!");
@@ -59,7 +59,7 @@ public class UsersService {
     }
 
     public UserResponsePublicDto getUserInfoPublic(Long id) {
-        var user = usersRepository.findById(id)
+        var user = usersRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> {
                     log.error("User not found!");
                     return new NotFoundException("User not found!");

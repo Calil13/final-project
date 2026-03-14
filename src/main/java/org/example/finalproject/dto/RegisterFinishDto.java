@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.example.finalproject.entity.Address;
 import org.example.finalproject.validation.ValidEmail;
+import org.example.finalproject.validation.ValidPassword;
 import org.example.finalproject.validation.ValidPhone;
 
 @Data
@@ -19,6 +20,7 @@ public class RegisterFinishDto {
     @ValidPhone
     private String phone;
 
+    @ValidPassword
     private String password;
     private AddressDto address;
 }

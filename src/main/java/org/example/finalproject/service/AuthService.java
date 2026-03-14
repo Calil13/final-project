@@ -237,10 +237,13 @@ public class AuthService {
             throw new RuntimeException("Password is incorrect!");
         }
 
-        var token = refreshTokenRepository.findByUser(user)
-                .orElseThrow(() -> new NotFoundException("Refresh token not found!"));
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            var token = refreshTokenRepository.findByUser(user)
+                    .orElseThrow(() -> new NotFoundException("Refresh token not found!"));
 
-        refreshTokenRepository.deleteByToken(token.getToken());
+            refreshTokenRepository.deleteByToken(token.getToken());
+        }
+
         user.setIsActive(false);
 
         log.info("User logged. \nUser ID: {}", user.getId());

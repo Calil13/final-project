@@ -1,6 +1,7 @@
 package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.ProductReviewsResponseDto;
 import org.example.finalproject.entity.ProductReview;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductReviewsService {
 
     private final UsersRepository usersRepository;

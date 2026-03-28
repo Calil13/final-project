@@ -1,6 +1,7 @@
 package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.FavoriteProductsDto;
 import org.example.finalproject.entity.Favorites;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FavoriteService {
 
     private final UsersRepository usersRepository;

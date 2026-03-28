@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.ProductCreateDto;
 import org.example.finalproject.dto.ProductUpdateDto;
 import org.example.finalproject.dto.ProductResponseDto;
@@ -15,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/products")
 @Tag(name = "Products API", description = "Product management endpoints")
 public class ProductController {

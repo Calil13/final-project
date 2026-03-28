@@ -1,6 +1,7 @@
 package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.PayCardDto;
 import org.example.finalproject.dto.PaymentResponseDto;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PaymentsService {
 
     private final UsersRepository usersRepository;
@@ -43,10 +44,6 @@ public class PaymentsService {
                     log.error("Customer not found!");
                     return new NotFoundException("Customer not found!");
                 });
-
-        if (cardDto == null) {
-            throw new IllegalArgumentException("Card payment requires card data!");
-        }
 
         var order = ordersRepository.findByCustomerAndOrderStatus(customer, OrderStatus.CREATED)
                 .orElseThrow(() -> {
@@ -110,8 +107,11 @@ public class PaymentsService {
                     + address.getStreet() + ", \n"
                     + address.getHome();
 
+            log.info("Payment successful for order {} by user {}. Pickup address: {}", order.getId(), customer.getName(), pickupAddress);
+
             return new PaymentResponseDto("Payment completed successfully." + " - Owner address :" + pickupAddress);
         }
+        log.info("Payment successful for order {} by user {}", order.getId(), customer.getName());
 
         return new PaymentResponseDto("Payment completed successfully.");
     }

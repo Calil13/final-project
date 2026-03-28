@@ -1,6 +1,7 @@
 package org.example.finalproject.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalproject.dto.AddressDto;
 import org.example.finalproject.dto.OrderInfoResponseDto;
@@ -28,7 +29,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrdersService {
 
     private final OrdersRepository ordersRepository;

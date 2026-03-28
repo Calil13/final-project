@@ -3,6 +3,7 @@ package org.example.finalproject.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.finalproject.dto.ProductImageDto;
 import org.example.finalproject.entity.ProductImage;
 import org.example.finalproject.service.ProductImageService;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/productImage")
 @Tag(name = "Images API", description = "Products' images endpoints.")
 public class ProductImageController {

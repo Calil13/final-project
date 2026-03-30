@@ -13,7 +13,7 @@ public class OverdueEmailScheduler {
 
     private final OverdueEmailService overdueEmailService;
 
-    @Scheduled(cron = "0 0 11  * * *") // hər gün saat 00:00
+    @Scheduled(cron = "0 0 0  * * *") // hər gün saat 00:00
     public void sendOverdueEmails() {
         overdueEmailService.notifyOverdueOrders();
     }

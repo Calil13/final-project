@@ -74,7 +74,7 @@ class AddressServiceTest extends Specification {
         1 * addressRepository.findByUser(user) >> Optional.of(existingAddress)
         1 * addressRepository.save({ Address addr ->
             addr.city == "London" && addr.street == "Baker St" && addr.home == "221B"
-        }) >> { it[0 as String] }
+        }) >> { it[0] }
 
         and: "success message is returned"
         response == "Address changed successfully."

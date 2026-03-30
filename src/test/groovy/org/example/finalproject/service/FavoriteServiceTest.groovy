@@ -115,7 +115,15 @@ class FavoriteServiceTest extends Specification {
         given: "an existing favorite item"
         def email = "user@test.com"
         def favoriteId = 50L
-        def favorite = new Favorites(id: favoriteId)
+
+        def user = new Users(email: email, deleted: false)
+        def product = new Products(id: 1L)
+
+        def favorite = new Favorites(
+                id: favoriteId,
+                customer: user,
+                product: product
+        )
 
         setupSecurityContext(email)
 

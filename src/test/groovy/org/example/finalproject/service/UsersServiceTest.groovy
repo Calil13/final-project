@@ -54,7 +54,7 @@ class UsersServiceTest extends Specification {
         def addressDto = Mock(AddressDto)
         def responseDto = Mock(UserResponseDto)
 
-        usersRepository.findByEmailAndDeletedFalse("user@mail.com") >> Optional.of(user)
+        usersRepository.findByEmailAndDeletedFalseAndIsActiveTrue("user@mail.com") >> Optional.of(user)
         addressRepository.findByUser(user) >> Optional.of(address)
         addressMapper.toDto(address) >> addressDto
         usersMapper.toResponseDto(user, addressDto as AddressDto) >> responseDto
@@ -87,7 +87,7 @@ class UsersServiceTest extends Specification {
         then:
         user.password == "encodedNew"
         1 * usersRepository.save(user)
-        result == "Password changed successfully!"
+        result == "Password changed successfully."
     }
 
     def "updatePassword should throw when current password wrong"() {

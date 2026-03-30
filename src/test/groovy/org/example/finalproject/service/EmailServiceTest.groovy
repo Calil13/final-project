@@ -24,7 +24,7 @@ class EmailServiceTest extends Specification {
         then:
         1 * mailSender.send({ SimpleMailMessage msg ->
             msg.to[0] == to
-            msg.subject == "Your OTP Code"
+            msg.subject == "OTP"
             msg.text == "Your OTP code is: 123456"
         })
     }

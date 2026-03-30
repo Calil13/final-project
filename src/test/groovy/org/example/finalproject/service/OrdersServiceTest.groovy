@@ -192,7 +192,7 @@ class OrdersServiceTest extends Specification {
         then:
         product.isAvailable
         order.orderStatus == OrderStatus.RETURNED
-        result.statusCode.value() == 200
+        result == "The product has been returned."
     }
 
     def "should fail return if product not expired"() {
@@ -209,7 +209,7 @@ class OrdersServiceTest extends Specification {
         def result = service.returnRental(1)
 
         then:
-        result.statusCode.value() == 400
+        result == "The product has not expired yet."
     }
 
     def "should delete order successfully"() {

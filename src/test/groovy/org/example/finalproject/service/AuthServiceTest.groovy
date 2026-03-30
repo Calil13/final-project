@@ -133,7 +133,7 @@ class AuthServiceTest extends Specification {
         given:
         def oldTokenStr = "old-refresh"
         def request = new RefreshTokenRequestDto(refreshToken: oldTokenStr)
-        def user = new Users(email: "user@test.com")
+        def user = new Users(email: "user@test.com", deleted: false)
         def storedToken = new RefreshToken(
                 token: oldTokenStr,
                 user: user,
@@ -182,7 +182,13 @@ class AuthServiceTest extends Specification {
         given:
         def email = "test@test.com"
         def password = "password"
-        def user = new Users(email: email, password: "hashedPassword")
+        def user = new Users(
+                email: email,
+                password: "hashedPassword",
+                userRole: UserRole.OWNER,
+                isActive: true,
+                deleted: false
+        )
         def token = new RefreshToken(token: "token-to-delete", user: user)
 
         def auth = Mock(Authentication)

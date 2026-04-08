@@ -6,6 +6,7 @@ import org.example.finalproject.entity.OtpCode;
 import org.example.finalproject.exception.BadRequestException;
 import org.example.finalproject.exception.NotFoundException;
 import org.example.finalproject.exception.NotValidException;
+import org.example.finalproject.exception.OtpExpiredException;
 import org.example.finalproject.repository.OtpRepository;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class OtpService {
                 .orElseThrow(() -> new NotFoundException("OTP not found!"));
 
         if (otp.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTP has expired!");
+            throw new OtpExpiredException("OTP has expired!");
         }
 
         if (!otp.getOtp().equals(Otp)) {

@@ -172,7 +172,7 @@ public class AuthService {
 
         if (user.getUserRole() == UserRole.ADMIN) {
             log.error("Admin must log in using the 'admin/login' method.");
-            throw new ProductInUseException("LOGIN_ERROR");
+            throw new AccessDeniedException("LOGIN_ERROR");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {

@@ -32,9 +32,8 @@ public class UsersController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/update-fullName")
-    public UsersUpdateFullNameRequestDto updateFullNameRequest(@RequestBody UsersUpdateFullNameRequestDto update, Authentication authentication) {
-        String email = authentication.getName();
-        return usersService.updateFullNameRequest(update, email);
+    public UsersUpdateFullNameRequestDto updateFullNameRequest(@RequestBody UsersUpdateFullNameRequestDto update) {
+        return usersService.updateFullNameRequest(update);
     }
 
     @SecurityRequirement(name = "bearerAuth")

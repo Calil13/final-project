@@ -85,8 +85,12 @@ public class UsersService {
         return usersMapper.toResponsePublicDto(user, addressDto);
     }
 
-    public UsersUpdateFullNameRequestDto updateFullNameRequest(UsersUpdateFullNameRequestDto update, String email) {
-        var user = usersRepository.findByEmailAndDeletedFalse(email)
+    public UsersUpdateFullNameRequestDto updateFullNameRequest(UsersUpdateFullNameRequestDto update) {
+        String currentEmail = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        var user = usersRepository.findByEmailAndDeletedFalse(currentEmail)
                 .orElseThrow(() -> new NotFoundException("User not found!"));
 
         user.setName(update.getName());
